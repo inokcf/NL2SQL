@@ -21,7 +21,8 @@ async def extract_keywords(state: DataAgentState, runtime: Runtime[DataAgentCont
     writer({"type": "progress", "step": step, "status": "running"})
 
     try:
-        query = state["query"]
+        # 多轮追问在 load_memory 中已经补全指代，这里优先使用独立问题抽取关键词
+        query = state.get("resolved_query") or state["query"]
 
         # 只保留更可能承载业务含义的词性，减少“的、帮我、一下”这类无检索价值的噪声
         allow_pos = (

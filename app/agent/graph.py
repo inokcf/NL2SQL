@@ -13,13 +13,16 @@ from langgraph.constants import END, START
 from langgraph.graph import StateGraph
 
 from app.agent.context import DataAgentContext
+from app.agent.llm import llm
 from app.agent.nodes.add_extra_context import add_extra_context
 from app.agent.nodes.correct_sql import correct_sql
 from app.agent.nodes.extract_keywords import extract_keywords
 from app.agent.nodes.filter_metric import filter_metric
 from app.agent.nodes.filter_table import filter_table
 from app.agent.nodes.generate_sql import generate_sql
+from app.agent.nodes.load_memory import load_memory
 from app.agent.nodes.merge_retrieved_info import merge_retrieved_info
+from app.agent.nodes.persist_memory import persist_memory
 from app.agent.nodes.recall_column import recall_column
 from app.agent.nodes.recall_metric import recall_metric
 from app.agent.nodes.recall_value import recall_value
@@ -33,16 +36,25 @@ from app.clients.mysql_client_manager import (
     meta_mysql_client_manager,
 )
 from app.clients.qdrant_client_manager import qdrant_client_manager
+from app.clients.redis_client_manager import redis_client_manager
+from app.conf.app_config import app_config
 from app.repositories.es.value_es_repository import ValueESRepository
 from app.repositories.mysql.dw.dw_mysql_repository import DWMySQLRepository
 from app.repositories.mysql.meta.meta_mysql_repository import MetaMySQLRepository
 from app.repositories.qdrant.column_qdrant_repository import ColumnQdrantRepository
+from app.repositories.qdrant.conversation_memory_qdrant_repository import (
+    ConversationMemoryQdrantRepository,
+)
 from app.repositories.qdrant.metric_qdrant_repository import MetricQdrantRepository
+from app.repositories.redis.session_redis_repository import SessionRedisRepository
+from app.services.conversation_memory_service import ConversationMemoryService
 
 # StateGraph 声明整张图使用的状态结构和运行时上下文结构
 graph_builder = StateGraph(state_schema=DataAgentState, context_schema=DataAgentContext)
 
 # 注册节点：每个节点负责问数链路中的一个清晰步骤
+# 图执行前先加载多轮会话记忆，执行后再把本轮问答写回记忆系统
+graph_builder.add_node("load_memory", load_memory)
 graph_builder.add_node("extract_keywords", extract_keywords)
 graph_builder.add_node("recall_column", recall_column)
 graph_builder.add_node("recall_value", recall_value)
@@ -55,9 +67,11 @@ graph_builder.add_node("generate_sql", generate_sql)
 graph_builder.add_node("validate_sql", validate_sql)
 graph_builder.add_node("correct_sql", correct_sql)
 graph_builder.add_node("run_sql", run_sql)
+graph_builder.add_node("persist_memory", persist_memory)
 
-# 从用户问题开始，先抽取关键词作为后续检索的基础
-graph_builder.add_edge(START, "extract_keywords")
+# 先加载短期会话和长期记忆，再基于改写后的独立问题抽取关键词
+graph_builder.add_edge(START, "load_memory")
+graph_builder.add_edge("load_memory", "extract_keywords")
 
 # 关键词抽取后并行进入三类召回，分别面向字段 字段值和业务指标
 graph_builder.add_edge("extract_keywords", "recall_column")
@@ -86,7 +100,9 @@ graph_builder.add_conditional_edges(
     path_map={"run_sql": "run_sql", "correct_sql": "correct_sql"},
 )
 graph_builder.add_edge("correct_sql", "run_sql")
-graph_builder.add_edge("run_sql", END)
+# SQL 执行完成后保存本轮会话，再结束整个问数流程
+graph_builder.add_edge("run_sql", "persist_memory")
+graph_builder.add_edge("persist_memory", END)
 
 # 编译后的 graph 是对外使用的 Agent 执行入口
 graph = graph_builder.compile()
@@ -104,6 +120,8 @@ if __name__ == "__main__":
         es_client_manager.init()
         meta_mysql_client_manager.init()
         dw_mysql_client_manager.init()
+        # 多轮记忆需要 Redis 短期会话和 Qdrant 长期向量记忆
+        redis_client_manager.init()
 
         # Meta MySQL 用来补齐元数据，DW MySQL 用来读取数据库方言和版本
         async with (
@@ -122,9 +140,28 @@ if __name__ == "__main__":
             )
             value_es_repository = ValueESRepository(es_client_manager.client)
 
+            # 会话记忆服务统一协调 Redis 短期消息和 Qdrant 长期向量记忆
+            session_repository = SessionRedisRepository(
+                redis_client_manager.client, app_config.redis
+            )
+            conversation_memory_repository = ConversationMemoryQdrantRepository(
+                qdrant_client_manager.client
+            )
+            conversation_memory_service = ConversationMemoryService(
+                session_repository=session_repository,
+                memory_repository=conversation_memory_repository,
+                embedding_client=embedding_client_manager.client,
+                llm=llm,
+            )
+
             # 当前只需要传入原始问题，后续节点会逐步写回召回、过滤和额外上下文结果
-            state = DataAgentState(query="统计华北地区的销售总额")
+            state = DataAgentState(
+                query="统计华北地区的销售总额",
+                session_id="local-debug-session",
+                user_id="local-debug-user",
+            )
             context = DataAgentContext(
+                conversation_memory_service=conversation_memory_service,
                 column_qdrant_repository=column_qdrant_repository,
                 embedding_client=embedding_client_manager.client,
                 metric_qdrant_repository=metric_qdrant_repository,
@@ -144,5 +181,6 @@ if __name__ == "__main__":
         await es_client_manager.close()
         await meta_mysql_client_manager.close()
         await dw_mysql_client_manager.close()
+        await redis_client_manager.close()
 
     asyncio.run(test())

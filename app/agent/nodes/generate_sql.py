@@ -30,13 +30,16 @@ async def generate_sql(state: DataAgentState, runtime: Runtime[DataAgentContext]
         metric_infos = state["metric_infos"]
         date_info = state["date_info"]
         db_info = state["db_info"]
-        query = state["query"]
+        # 使用改写后的独立问题，并注入语义检索到的长期记忆作为偏好参考
+        query = state.get("resolved_query") or state["query"]
+        memory_context = state.get("memory_context") or "无"
 
         prompt = PromptTemplate(
             template=load_prompt("generate_sql"),
             input_variables=[
                 "table_infos",
                 "metric_infos",
+                "memory_context",
                 "date_info",
                 "db_info",
                 "query",
@@ -55,6 +58,7 @@ async def generate_sql(state: DataAgentState, runtime: Runtime[DataAgentContext]
                 "metric_infos": yaml.dump(
                     metric_infos, allow_unicode=True, sort_keys=False
                 ),
+                "memory_context": memory_context,
                 "date_info": yaml.dump(date_info, allow_unicode=True, sort_keys=False),
                 "db_info": yaml.dump(db_info, allow_unicode=True, sort_keys=False),
                 "query": query,

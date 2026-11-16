@@ -20,7 +20,13 @@ export type ErrorEvent = {
   message: string;
 };
 
-export type AgentEvent = ProgressEvent | ResultEvent | ErrorEvent;
+export type SessionEvent = {
+  type: "session";
+  session_id: string;
+  user_id: string;
+};
+
+export type AgentEvent = ProgressEvent | ResultEvent | ErrorEvent | SessionEvent;
 
 export type StepState = {
   step: string;

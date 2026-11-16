@@ -12,6 +12,7 @@ from fastapi import Depends
 from langchain_huggingface import HuggingFaceEndpointEmbeddings
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.agent.llm import llm
 from app.clients.embedding_client_manager import embedding_client_manager
 from app.clients.es_client_manager import es_client_manager
 from app.clients.mysql_client_manager import (
@@ -19,12 +20,20 @@ from app.clients.mysql_client_manager import (
     meta_mysql_client_manager,
 )
 from app.clients.qdrant_client_manager import qdrant_client_manager
+from app.clients.redis_client_manager import redis_client_manager
+from app.conf.app_config import app_config
 from app.repositories.es.value_es_repository import ValueESRepository
 from app.repositories.mysql.dw.dw_mysql_repository import DWMySQLRepository
 from app.repositories.mysql.meta.meta_mysql_repository import MetaMySQLRepository
 from app.repositories.qdrant.column_qdrant_repository import ColumnQdrantRepository
+from app.repositories.qdrant.conversation_memory_qdrant_repository import (
+    ConversationMemoryQdrantRepository,
+)
 from app.repositories.qdrant.metric_qdrant_repository import MetricQdrantRepository
+from app.repositories.redis.session_redis_repository import SessionRedisRepository
+from app.services.conversation_memory_service import ConversationMemoryService
 from app.services.query_service import QueryService
+from app.services.session_service import SessionService
 
 
 async def get_meta_session():
@@ -82,6 +91,57 @@ async def get_value_es_repository() -> ValueESRepository:
     return ValueESRepository(es_client_manager.client)
 
 
+async def get_session_redis_repository() -> SessionRedisRepository:
+    """创建短期会话记忆 Redis 仓储"""
+
+    return SessionRedisRepository(redis_client_manager.client, app_config.redis)
+
+
+async def get_conversation_memory_repository() -> ConversationMemoryQdrantRepository:
+    """创建长期会话记忆 Qdrant 仓储"""
+
+    return ConversationMemoryQdrantRepository(qdrant_client_manager.client)
+
+
+async def get_session_service(
+    session_repository: Annotated[
+        SessionRedisRepository, Depends(get_session_redis_repository)
+    ],
+    memory_repository: Annotated[
+        ConversationMemoryQdrantRepository,
+        Depends(get_conversation_memory_repository),
+    ],
+) -> SessionService:
+    """组装会话管理服务"""
+
+    return SessionService(
+        session_repository=session_repository,
+        memory_repository=memory_repository,
+    )
+
+
+async def get_conversation_memory_service(
+    session_repository: Annotated[
+        SessionRedisRepository, Depends(get_session_redis_repository)
+    ],
+    memory_repository: Annotated[
+        ConversationMemoryQdrantRepository,
+        Depends(get_conversation_memory_repository),
+    ],
+    embedding_client: Annotated[
+        HuggingFaceEndpointEmbeddings, Depends(get_embedding_client)
+    ],
+) -> ConversationMemoryService:
+    """组装短期会话与长期向量记忆服务"""
+
+    return ConversationMemoryService(
+        session_repository=session_repository,
+        memory_repository=memory_repository,
+        embedding_client=embedding_client,
+        llm=llm,
+    )
+
+
 async def get_query_service(
     meta_mysql_repository: Annotated[
         MetaMySQLRepository, Depends(get_meta_mysql_repository)
@@ -97,6 +157,10 @@ async def get_query_service(
         MetricQdrantRepository, Depends(get_metric_qdrant_repository)
     ],
     value_es_repository: Annotated[ValueESRepository, Depends(get_value_es_repository)],
+    session_service: Annotated[SessionService, Depends(get_session_service)],
+    conversation_memory_service: Annotated[
+        ConversationMemoryService, Depends(get_conversation_memory_service)
+    ],
 ) -> QueryService:
     """组装一次查询所需的业务服务"""
 
@@ -108,4 +172,6 @@ async def get_query_service(
         column_qdrant_repository=column_qdrant_repository,
         metric_qdrant_repository=metric_qdrant_repository,
         value_es_repository=value_es_repository,
+        session_service=session_service,
+        conversation_memory_service=conversation_memory_service,
     )

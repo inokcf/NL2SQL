@@ -60,10 +60,43 @@ class DBInfoState(TypedDict):
     version: str
 
 
+class ChatMessageState(TypedDict):
+    """短期会话记忆中的一条消息"""
+
+    id: str
+    role: str
+    content: str
+    created_at: str
+    sql: str
+    resolved_query: str
+    metadata: dict
+
+
+class MemoryInfoState(TypedDict):
+    """注入提示词的长期记忆"""
+
+    id: str
+    memory_type: str
+    content: str
+    question: str
+    resolved_query: str
+    sql: str
+    created_at: str
+    score: float | None
+
+
 class DataAgentState(TypedDict):
     """一次问数链路中的核心状态"""
 
-    query: str  # 用户输入的查询
+    query: str  # 用户原始输入
+    session_id: str  # 当前多轮会话 id
+    user_id: str  # 当前用户 id，用于隔离长期记忆
+    resolved_query: str  # 结合历史对话改写后的独立问题
+    conversation_history: list[ChatMessageState]  # 最近若干轮短期会话消息
+    history_context: str  # 格式化后的历史对话片段
+    relevant_memories: list[MemoryInfoState]  # 语义检索到的长期记忆
+    memory_context: str  # 格式化后的长期记忆片段
+
     keywords: list[str]  # 抽取的关键词
     retrieved_column_infos: list[ColumnInfo]  # 检索到的字段信息
     retrieved_metric_infos: list[MetricInfo]  # 检索到的指标信息
@@ -75,5 +108,6 @@ class DataAgentState(TypedDict):
     db_info: DBInfoState  # 数据库方言和版本信息
 
     sql: str  # 生成或校正后的SQL
+    sql_result: list[dict]  # SQL 执行结果
 
     error: str  # 校验SQL时出现的错误信息

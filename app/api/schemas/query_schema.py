@@ -9,7 +9,11 @@ from pydantic import BaseModel
 
 
 class QuerySchema(BaseModel):
-    """`/api/query` 请求体，承载用户输入的自然语言问题"""
+    """`/api/query` 请求体，承载用户问题及多轮会话标识"""
 
     # 前端请求体中的 query 字段，例如 {"query": "统计华北地区销售额"}
     query: str
+    # 不传时后端会自动创建新会话，并在 SSE 的 session 事件中返回
+    session_id: str | None = None
+    # 用于隔离不同用户的长期记忆
+    user_id: str = "default"

@@ -17,11 +17,14 @@ from app.repositories.mysql.dw.dw_mysql_repository import DWMySQLRepository
 from app.repositories.mysql.meta.meta_mysql_repository import MetaMySQLRepository
 from app.repositories.qdrant.column_qdrant_repository import ColumnQdrantRepository
 from app.repositories.qdrant.metric_qdrant_repository import MetricQdrantRepository
+from app.services.conversation_memory_service import ConversationMemoryService
 
 
 class DataAgentContext(TypedDict):
     """LangGraph Runtime 中传递的上下文对象"""
 
+    # 会话记忆服务，负责读写 Redis 短期记忆和 Qdrant 长期记忆
+    conversation_memory_service: ConversationMemoryService
     # 字段向量仓储，负责根据向量从 Qdrant 检索候选字段
     column_qdrant_repository: ColumnQdrantRepository
     # Embedding 客户端，负责把关键词转换成向量检索所需的 query vector

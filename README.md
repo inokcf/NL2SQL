@@ -76,14 +76,58 @@
 
 ![电商问数查询结果页：LangGraph 执行流程、SQL 校验执行和查询结果表格](docs/images/shopkeeper-agent-query-result.jpg)
 
+## 🧠 多轮会话与记忆
+
+在原有单轮问数链路之外，新增了 Redis 短期会话记忆和 Qdrant 长期向量记忆：
+
+| 记忆层 | 存储 | 内容 | 生命周期 |
+| --- | --- | --- | --- |
+| 短期会话 | Redis List | 最近 N 条问答消息、SQL 和改写后问题 | 每次追问刷新 TTL，默认 30 分钟 |
+| 长期记忆 | Qdrant | 历史问数记录和抽取出的用户偏好/口径 | 持久保存，按 user_id 隔离 |
+
+执行流程：
+
+1. `load_memory` 读取 Redis 最近消息和 Qdrant 语义记忆，把“那上个月呢”等追问改写成独立问题。
+2. 后续召回、过滤和 SQL 生成节点统一使用改写后的问题。
+3. 长期记忆以 `- [历史问数] ...` / `- [长期偏好] ...` 形式注入 `generate_sql` 提示词。
+4. `persist_memory` 把本轮问答写回 Redis，并把 Embedding 后的问数记录和可复用偏好写入 Qdrant。
+
+配置位于 `conf/app_config.yaml`：
+
+```yaml
+redis:
+  host: localhost
+  port: 6380
+  password: dili123
+  session_ttl_seconds: 1800  # 短期会话 TTL
+  max_messages: 20           # 每个会话保留的最近消息数
+
+memory:
+  long_term_enabled: true
+  long_term_top_k: 5
+  long_term_score_threshold: 0.55
+  extraction_enabled: true
+```
+
+会话管理接口：
+
+- `POST /api/sessions` 创建会话
+- `GET /api/sessions?user_id=default` 会话列表
+- `GET /api/sessions/{session_id}` 会话详情（最近消息）
+- `GET /api/sessions/{session_id}/memories` 查看该会话写入的长期记忆
+- `DELETE /api/sessions/{session_id}` 删除会话及其长期记忆
+
+`POST /api/query` 新增 `session_id` 和 `user_id` 字段；不传 `session_id` 时后端自动创建，并通过 SSE 的 `session` 事件返回。
+
 ## 🛠️ 项目技术栈
 
 | 模块       | 技术                              | 作用                                           |
 | ---------- | --------------------------------- | ---------------------------------------------- |
 | 教学数仓   | `MySQL`                           | 模拟事实表、维度表和分析型查询环境             |
 | 元数据库   | `MySQL` / `SQLAlchemy`            | 保存表、字段、指标、字段指标关系等结构化元数据 |
-| 向量检索   | `Qdrant`                          | 保存字段和指标向量，支持语义召回               |
+| 向量检索   | `Qdrant`                          | 保存字段、指标和长期记忆向量，支持语义召回     |
 | 全文检索   | `Elasticsearch`                   | 保存字段真实取值，支持关键词和值域检索         |
+| 短期会话   | `Redis`                           | 保存最近 N 条多轮消息，并通过 TTL 自动过期     |
 | Embedding  | `TEI` / `BAAI/bge-large-zh-v1.5`  | 将字段、指标、问题等文本转成向量               |
 | 智能体编排 | `LangGraph`                       | 组织多阶段问数工作流                           |
 | 模型接入   | `LangChain`                       | 封装 LLM 与 Embedding 调用                     |
@@ -100,15 +144,15 @@ shopkeeper-agent/
 ├── app/
 │   ├── agent/            # LangGraph 图、状态、上下文和各类节点
 │   ├── api/              # FastAPI 路由、依赖注入、生命周期和请求结构
-│   ├── clients/          # MySQL、Qdrant、Elasticsearch、Embedding 客户端管理
+│   ├── clients/          # MySQL、Qdrant、Elasticsearch、Redis、Embedding 客户端管理
 │   ├── conf/             # 配置 dataclass 与配置加载工具
 │   ├── core/             # 日志、request_id 上下文等通用能力
 │   ├── entities/         # 更贴近业务语义的数据对象
 │   ├── models/           # SQLAlchemy ORM 模型
 │   ├── prompt/           # Prompt 加载工具
-│   ├── repositories/     # MySQL、Qdrant、Elasticsearch 数据访问层
+│   ├── repositories/     # MySQL、Qdrant、Elasticsearch、Redis 数据访问层
 │   ├── scripts/          # 元数据知识库构建脚本
-│   └── services/         # 元数据构建服务和问数查询服务
+│   └── services/         # 元数据构建、问数查询、会话管理和记忆服务
 ├── conf/                 # app_config.yaml、meta_config.yaml
 ├── docker/               # Docker Compose、MySQL 初始化 SQL、ES 插件、Embedding 挂载目录
 ├── frontend/             # React + Vite + Tailwind CSS 前端项目

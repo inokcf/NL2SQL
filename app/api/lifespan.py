@@ -17,6 +17,11 @@ from app.clients.mysql_client_manager import (
     meta_mysql_client_manager,
 )
 from app.clients.qdrant_client_manager import qdrant_client_manager
+from app.clients.redis_client_manager import redis_client_manager
+from app.core.log import logger
+from app.repositories.qdrant.conversation_memory_qdrant_repository import (
+    ConversationMemoryQdrantRepository,
+)
 
 
 @asynccontextmanager
@@ -29,6 +34,21 @@ async def lifespan(app: FastAPI):
     es_client_manager.init()
     meta_mysql_client_manager.init()
     dw_mysql_client_manager.init()
+    redis_client_manager.init()
+
+    # 提前探测 Redis 和创建长期记忆集合；失败只告警，不阻止应用启动
+    try:
+        await redis_client_manager.client.ping()
+    except Exception as e:
+        logger.warning(f"Redis 暂不可用，会话记忆将降级：{e}")
+
+    try:
+        memory_repository = ConversationMemoryQdrantRepository(
+            qdrant_client_manager.client
+        )
+        await memory_repository.ensure_collection()
+    except Exception as e:
+        logger.warning(f"长期记忆集合初始化失败，首次使用时将重试：{e}")
 
     # yield 之前是启动逻辑，yield 之后是关闭逻辑；中间阶段由 FastAPI 正常处理请求
     yield
@@ -38,3 +58,4 @@ async def lifespan(app: FastAPI):
     await es_client_manager.close()
     await meta_mysql_client_manager.close()
     await dw_mysql_client_manager.close()
+    await redis_client_manager.close()

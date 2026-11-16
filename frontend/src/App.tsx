@@ -45,6 +45,7 @@ function upsertStep(steps: StepState[] = [], event: Extract<AgentEvent, { type: 
 export default function App() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [draft, setDraft] = useState("");
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const [activeController, setActiveController] = useState<AbortController | null>(null);
   const scrollRef = useRef<HTMLDivElement | null>(null);
 
@@ -90,6 +91,12 @@ export default function App() {
     setMessages((current) => [...current, userMessage, assistantMessage]);
 
     const onEvent = (event: AgentEvent) => {
+      if (event.type === "session") {
+        // 记住后端分配的会话 id，下一轮提问会自动携带，形成多轮上下文
+        setSessionId(event.session_id);
+        return;
+      }
+
       setMessages((current) =>
         current.map((message) => {
           if (message.id !== assistantId) return message;
@@ -111,18 +118,26 @@ export default function App() {
             };
           }
 
-          return {
-            ...message,
-            status: "error",
-            content: "这次查询没有成功。",
-            error: event.message,
-          };
+          if (event.type === "error") {
+            return {
+              ...message,
+              status: "error",
+              content: "这次查询没有成功。",
+              error: event.message,
+            };
+          }
+
+          return message;
         }),
       );
     };
 
     try {
-      await streamQuery(query, { signal: controller.signal, onEvent });
+      await streamQuery(query, {
+        signal: controller.signal,
+        sessionId: sessionId ?? undefined,
+        onEvent,
+      });
       setMessages((current) =>
         current.map((message) =>
           message.id === assistantId && message.status === "streaming"
@@ -157,6 +172,8 @@ export default function App() {
     if (isStreaming) return;
     setMessages([]);
     setDraft("");
+    // 新会话不再复用旧 session_id，但旧的长期记忆仍保留在后端向量库中
+    setSessionId(null);
   };
 
   return (

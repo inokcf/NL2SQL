@@ -29,7 +29,11 @@ async def query_handler(
     """接收用户自然语言问题，并流式返回 LangGraph 工作流输出"""
 
     return StreamingResponse(
-        # query.query 是用户问题字符串；QueryService.query 返回异步生成器供响应逐段消费
-        query_service.query(query.query),
+        # 透传用户和会话标识；session_id 为空时由 QueryService 自动创建新会话
+        query_service.query(
+            query=query.query,
+            user_id=query.user_id,
+            session_id=query.session_id,
+        ),
         media_type="text/event-stream",
     )

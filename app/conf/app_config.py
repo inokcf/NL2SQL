@@ -88,6 +88,31 @@ class LLMConfig:
 
 
 @dataclass
+class RedisConfig:
+    """Redis 连接与短期会话记忆配置"""
+
+    host: str
+    port: int
+    password: str
+    db: int
+    key_prefix: str
+    session_ttl_seconds: int
+    max_messages: int
+
+
+@dataclass
+class MemoryConfig:
+    """长期向量记忆配置"""
+
+    long_term_enabled: bool
+    history_prompt_messages: int
+    long_term_top_k: int
+    long_term_score_threshold: float
+    extraction_enabled: bool
+    max_memory_chars: int
+
+
+@dataclass
 class AppConfig:
     """项目级总配置入口"""
 
@@ -98,6 +123,8 @@ class AppConfig:
     embedding: EmbeddingConfig
     es: ESConfig
     llm: LLMConfig
+    redis: RedisConfig
+    memory: MemoryConfig
 
 
 # 从当前文件位置回到项目根目录，再定位到 conf/app_config.yaml

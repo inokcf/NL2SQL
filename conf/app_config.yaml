@@ -42,3 +42,28 @@ llm:
   model_name: deepseek-v4-flash
   api_key: ${oc.env:LLM_API_KEY}
   base_url: https://api.deepseek.com
+
+redis:
+  host: localhost
+  port: 6380
+  password: dili123
+  db: 0
+  key_prefix: nl2sql
+  # 短期会话记忆的存活时间，每次追加消息都会刷新
+  session_ttl_seconds: 1800
+  # 每个会话最多保留最近多少条消息，超出后自动裁剪最旧消息
+  max_messages: 20
+
+memory:
+  # 是否启用长期向量记忆
+  long_term_enabled: true
+  # 问题改写和记忆抽取时最多参考最近多少条会话消息
+  history_prompt_messages: 10
+  # 长期记忆语义检索返回条数
+  long_term_top_k: 5
+  # 长期记忆相似度阈值，低于该分数的记忆不会注入提示词
+  long_term_score_threshold: 0.55
+  # 是否调用 LLM 从每轮问数中抽取可复用的长期偏好/口径
+  extraction_enabled: true
+  # 单条长期记忆最大字符数，避免异常长文本污染向量库
+  max_memory_chars: 500
