@@ -8,7 +8,8 @@ FastAPI 依赖组装
 
 from typing import Annotated
 
-from fastapi import Depends
+from fastapi import Depends, HTTPException
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from langchain_huggingface import HuggingFaceEndpointEmbeddings
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -22,18 +23,25 @@ from app.clients.mysql_client_manager import (
 from app.clients.qdrant_client_manager import qdrant_client_manager
 from app.clients.redis_client_manager import redis_client_manager
 from app.conf.app_config import app_config
+from app.core.security import decode_access_token
+from app.entities.user_info import UserInfo
 from app.repositories.es.value_es_repository import ValueESRepository
 from app.repositories.mysql.dw.dw_mysql_repository import DWMySQLRepository
 from app.repositories.mysql.meta.meta_mysql_repository import MetaMySQLRepository
+from app.repositories.mysql.meta.user_mysql_repository import UserMySQLRepository
 from app.repositories.qdrant.column_qdrant_repository import ColumnQdrantRepository
 from app.repositories.qdrant.conversation_memory_qdrant_repository import (
     ConversationMemoryQdrantRepository,
 )
 from app.repositories.qdrant.metric_qdrant_repository import MetricQdrantRepository
 from app.repositories.redis.session_redis_repository import SessionRedisRepository
+from app.services.auth_service import AuthService
 from app.services.conversation_memory_service import ConversationMemoryService
 from app.services.query_service import QueryService
 from app.services.session_service import SessionService
+
+# auto_error=False 让缺少 Authorization 头时由依赖函数统一返回 401
+bearer_scheme = HTTPBearer(auto_error=False)
 
 
 async def get_meta_session():
@@ -56,6 +64,52 @@ async def get_embedding_client() -> HuggingFaceEndpointEmbeddings:
     """获取应用启动阶段初始化好的 Embedding 客户端"""
 
     return embedding_client_manager.client
+
+
+async def get_user_repository(
+    session: Annotated[AsyncSession, Depends(get_meta_session)],
+) -> UserMySQLRepository:
+    """创建用户信息仓储"""
+    return UserMySQLRepository(session)
+
+
+async def get_auth_service(
+    user_repository: Annotated[UserMySQLRepository, Depends(get_user_repository)],
+) -> AuthService:
+    """组装注册登录服务"""
+    return AuthService(user_repository)
+
+
+async def get_current_user(
+    credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer_scheme)],
+    user_repository: Annotated[UserMySQLRepository, Depends(get_user_repository)],
+) -> UserInfo:
+    """解析 Bearer Token 并加载当前登录用户"""
+
+    if credentials is None or not credentials.credentials:
+        raise HTTPException(
+            status_code=401,
+            detail="请先登录",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    payload = decode_access_token(credentials.credentials)
+    user_id = payload.get("sub") if payload else None
+    if not isinstance(user_id, str) or not user_id:
+        raise HTTPException(
+            status_code=401,
+            detail="登录凭证无效或已过期",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    user = await user_repository.get_by_id(user_id)
+    if user is None or not user.is_active:
+        raise HTTPException(
+            status_code=401,
+            detail="用户不存在或已被禁用",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return user
 
 
 async def get_dw_session():

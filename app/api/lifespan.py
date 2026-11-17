@@ -19,9 +19,11 @@ from app.clients.mysql_client_manager import (
 from app.clients.qdrant_client_manager import qdrant_client_manager
 from app.clients.redis_client_manager import redis_client_manager
 from app.core.log import logger
+from app.repositories.mysql.meta.user_mysql_repository import UserMySQLRepository
 from app.repositories.qdrant.conversation_memory_qdrant_repository import (
     ConversationMemoryQdrantRepository,
 )
+from app.services.auth_service import AuthService
 
 
 @asynccontextmanager
@@ -49,6 +51,14 @@ async def lifespan(app: FastAPI):
         await memory_repository.ensure_collection()
     except Exception as e:
         logger.warning(f"长期记忆集合初始化失败，首次使用时将重试：{e}")
+
+    # 为已有数据库补建用户表，并在空库中创建体验账号
+    try:
+        async with meta_mysql_client_manager.session_factory() as meta_session:
+            auth_service = AuthService(UserMySQLRepository(meta_session))
+            await auth_service.ensure_default_user()
+    except Exception as e:
+        logger.warning(f"用户表初始化失败，登录功能可能不可用：{e}")
 
     # yield 之前是启动逻辑，yield 之后是关闭逻辑；中间阶段由 FastAPI 正常处理请求
     yield

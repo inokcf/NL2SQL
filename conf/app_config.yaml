@@ -43,14 +43,21 @@ llm:
   api_key: ${oc.env:LLM_API_KEY}
   base_url: https://api.deepseek.com
 
+auth:
+  # 生产环境务必通过 AUTH_SECRET_KEY 环境变量覆盖
+  secret_key: ${oc.env:AUTH_SECRET_KEY,dev-only-secret-change-me-please-32-bytes}
+  algorithm: HS256
+  # 登录 Token 有效期，默认 7 天
+  token_expire_minutes: 10080
+
 redis:
   host: localhost
   port: 6380
   password: dili123
   db: 0
   key_prefix: nl2sql
-  # 短期会话记忆的存活时间，每次追加消息都会刷新
-  session_ttl_seconds: 1800
+  # 短期会话记忆的存活时间，每次追加消息都会刷新；默认保留 7 天，便于回看近期会话
+  session_ttl_seconds: 604800
   # 每个会话最多保留最近多少条消息，超出后自动裁剪最旧消息
   max_messages: 20
 

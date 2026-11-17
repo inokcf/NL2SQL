@@ -15,5 +15,3 @@ class QuerySchema(BaseModel):
     query: str
     # 不传时后端会自动创建新会话，并在 SSE 的 session 事件中返回
     session_id: str | None = None
-    # 用于隔离不同用户的长期记忆
-    user_id: str = "default"

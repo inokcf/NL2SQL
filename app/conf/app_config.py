@@ -88,6 +88,15 @@ class LLMConfig:
 
 
 @dataclass
+class AuthConfig:
+    """登录认证配置"""
+
+    secret_key: str
+    algorithm: str
+    token_expire_minutes: int
+
+
+@dataclass
 class RedisConfig:
     """Redis 连接与短期会话记忆配置"""
 
@@ -123,6 +132,7 @@ class AppConfig:
     embedding: EmbeddingConfig
     es: ESConfig
     llm: LLMConfig
+    auth: AuthConfig
     redis: RedisConfig
     memory: MemoryConfig
 

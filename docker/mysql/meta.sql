@@ -46,3 +46,17 @@ CREATE TABLE column_metric
     metric_id VARCHAR(64) COMMENT '指标编号',
     PRIMARY KEY (column_id, metric_id)
 );
+
+
+CREATE TABLE IF NOT EXISTS user_info
+(
+    id            VARCHAR(36) PRIMARY KEY COMMENT '用户编号',
+    username      VARCHAR(64) NOT NULL UNIQUE COMMENT '登录用户名',
+    password_hash VARCHAR(255) NOT NULL COMMENT 'scrypt 密码哈希',
+    display_name  VARCHAR(64) NOT NULL DEFAULT '' COMMENT '展示名称',
+    role          VARCHAR(32) NOT NULL DEFAULT 'user' COMMENT '用户角色',
+    is_active     BOOLEAN NOT NULL DEFAULT TRUE COMMENT '是否启用',
+    created_at    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    updated_at    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

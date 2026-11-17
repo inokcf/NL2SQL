@@ -11,7 +11,6 @@
 
 # Python
 .venv/
-.uv-cache/
 .pre-commit-cache/
 venv/
 env/

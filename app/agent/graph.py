@@ -19,6 +19,7 @@ from app.agent.nodes.correct_sql import correct_sql
 from app.agent.nodes.extract_keywords import extract_keywords
 from app.agent.nodes.filter_metric import filter_metric
 from app.agent.nodes.filter_table import filter_table
+from app.agent.nodes.generate_answer import generate_answer
 from app.agent.nodes.generate_sql import generate_sql
 from app.agent.nodes.load_memory import load_memory
 from app.agent.nodes.merge_retrieved_info import merge_retrieved_info
@@ -67,6 +68,7 @@ graph_builder.add_node("generate_sql", generate_sql)
 graph_builder.add_node("validate_sql", validate_sql)
 graph_builder.add_node("correct_sql", correct_sql)
 graph_builder.add_node("run_sql", run_sql)
+graph_builder.add_node("generate_answer", generate_answer)
 graph_builder.add_node("persist_memory", persist_memory)
 
 # 先加载短期会话和长期记忆，再基于改写后的独立问题抽取关键词
@@ -100,8 +102,9 @@ graph_builder.add_conditional_edges(
     path_map={"run_sql": "run_sql", "correct_sql": "correct_sql"},
 )
 graph_builder.add_edge("correct_sql", "run_sql")
-# SQL 执行完成后保存本轮会话，再结束整个问数流程
-graph_builder.add_edge("run_sql", "persist_memory")
+# SQL 执行完成后先转为业务结论，再保存本轮会话并结束流程
+graph_builder.add_edge("run_sql", "generate_answer")
+graph_builder.add_edge("generate_answer", "persist_memory")
 graph_builder.add_edge("persist_memory", END)
 
 # 编译后的 graph 是对外使用的 Agent 执行入口

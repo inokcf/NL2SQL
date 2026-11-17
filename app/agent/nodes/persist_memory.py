@@ -28,6 +28,7 @@ async def persist_memory(state: DataAgentState, runtime: Runtime[DataAgentContex
             resolved_query=state.get("resolved_query") or state["query"],
             sql=state.get("sql", ""),
             sql_result=state.get("sql_result") or [],
+            answer=state.get("answer") or "",
             history=state.get("conversation_history") or [],
         )
     except Exception as e:

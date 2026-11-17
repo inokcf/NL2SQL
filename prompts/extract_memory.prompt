@@ -7,6 +7,7 @@
 【本轮问数信息】
 用户原始问题：{query}
 独立问题：{resolved_query}
+本轮分析结论：{answer}
 执行的 SQL：{sql}
 
 【抽取原则】
