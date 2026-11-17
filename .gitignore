@@ -58,3 +58,6 @@ Thumbs.db
 
 # Local TEI embedding model files (large)
 docker/embedding/
+
+#日志文件
+logs/
