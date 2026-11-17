@@ -1,10 +1,9 @@
 /**
- * 智能体接口客户端
- * 封装后端 /api/query SSE 流式接口请求与事件解析逻辑
+ * 问数 SSE 接口客户端
+ * 解析后端以 data: 开头的 SSE 消息，并持续回调 session / progress / result / error 事件。
  */
+import { apiUrl } from "./apiBase";
 import type { AgentEvent } from "../types/agent";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, "") ?? "";
 
 type QueryOptions = {
   signal?: AbortSignal;
@@ -14,13 +13,12 @@ type QueryOptions = {
 };
 
 export async function streamQuery(query: string, options: QueryOptions) {
-  const response = await fetch(`${API_BASE_URL}/api/query`, {
+  const response = await fetch(apiUrl("/api/query"), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Accept: "text/event-stream",
     },
-    // 已有会话时携带 session_id，后端会把本轮问题接到最近 N 条短期记忆之后
     body: JSON.stringify({
       query,
       session_id: options.sessionId,
@@ -51,17 +49,13 @@ export async function streamQuery(query: string, options: QueryOptions) {
 
     for (const chunk of chunks) {
       const event = parseSseChunk(chunk);
-      if (event) {
-        options.onEvent(event);
-      }
+      if (event) options.onEvent(event);
     }
   }
 
   buffer += decoder.decode();
   const tail = parseSseChunk(buffer);
-  if (tail) {
-    options.onEvent(tail);
-  }
+  if (tail) options.onEvent(tail);
 }
 
 function parseSseChunk(chunk: string): AgentEvent | null {

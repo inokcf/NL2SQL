@@ -1,7 +1,3 @@
-/**
- * Vite 环境变量类型声明
- * 补充前端运行时配置项的类型提示
- */
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {

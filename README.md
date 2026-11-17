@@ -72,7 +72,7 @@
 | 主线             | 做什么                                                                   | 涉及模块                                     |
 | ---------------- | ------------------------------------------------------------------------ | -------------------------------------------- |
 | 元数据知识库构建 | 抽取教学数仓中的表、字段、指标和字段取值，写入结构化库、向量库和全文索引 | `MySQL` / `Qdrant` / `Elasticsearch` / `TEI` |
-| 自然语言问数     | 基于用户问题完成召回、上下文整理、SQL 生成校验执行，并把过程流式返回前端 | `LangGraph` / `FastAPI` / `SSE` / `React`    |
+| 自然语言问数     | 基于用户问题完成召回、上下文整理、SQL 生成校验执行，并把过程流式返回前端 | `LangGraph` / `FastAPI` / `SSE` / `Vue`      |
 
 ![电商问数查询结果页：LangGraph 执行流程、SQL 校验执行和查询结果表格](docs/images/shopkeeper-agent-query-result.jpg)
 
@@ -133,9 +133,9 @@ memory:
 | 模型接入   | `LangChain`                       | 封装 LLM 与 Embedding 调用                     |
 | 后端接口   | `FastAPI`                         | 提供问数 API、依赖注入和生命周期管理           |
 | 流式协议   | `SSE`                             | 实时返回节点进度、查询结果和错误消息           |
-| 前端       | `React` / `Vite` / `Tailwind CSS` | 提供聊天式问数界面和流程展示                   |
+| 前端       | `Vue 3` / `Vite` / `TypeScript`   | 提供聊天式问数界面、会话管理和记忆查看         |
 | 日志追踪   | `ContextVar` / `loguru`           | 为并发请求注入 request_id，便于排查链路        |
-| 依赖管理   | `uv` / `pnpm`                     | 管理 Python 后端和前端依赖                     |
+| 依赖管理   | `uv` / `npm`                      | 管理 Python 后端和前端依赖                     |
 
 ## 📁 项目结构
 
@@ -155,7 +155,7 @@ shopkeeper-agent/
 │   └── services/         # 元数据构建、问数查询、会话管理和记忆服务
 ├── conf/                 # app_config.yaml、meta_config.yaml
 ├── docker/               # Docker Compose、MySQL 初始化 SQL、ES 插件、Embedding 挂载目录
-├── frontend/             # React + Vite + Tailwind CSS 前端项目
+├── frontend/             # Vue 3 + Vite + TypeScript 前端项目
 ├── prompts/              # SQL 生成、修正、过滤等 Prompt 模板
 ├── main.py               # FastAPI 应用入口
 └── pyproject.toml        # Python 项目依赖与工具配置
@@ -170,7 +170,7 @@ shopkeeper-agent/
 - Python `>= 3.14`
 - `uv`
 - Docker 与 Docker Compose
-- Node.js 与 `pnpm`
+- Node.js 与 `npm`
 
 ### 2. 克隆项目
 
@@ -276,8 +276,8 @@ SSE 消息类型：
 
 ```bash
 cd frontend
-pnpm install
-pnpm dev
+npm install
+npm run dev
 ```
 
 前端默认通过 Vite 代理把 `/api` 转发到 `http://127.0.0.1:8000`。如需修改：
