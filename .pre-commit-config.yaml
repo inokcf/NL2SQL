@@ -11,14 +11,14 @@ repos:
     hooks:
       - id: ruff-check
         name: ruff check --fix
-        entry: uv run --frozen --cache-dir .uv-cache ruff check --fix
+        entry: ruff check --fix
         language: system
         types_or: [python, pyi]
         require_serial: true
 
       - id: ruff-format
         name: ruff format
-        entry: uv run --frozen --cache-dir .uv-cache ruff format
+        entry: ruff format
         language: system
         types_or: [python, pyi]
         require_serial: true

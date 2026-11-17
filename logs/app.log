@@ -44,3 +44,23 @@
 2026-11-17 10:44:00.438 | INFO     | request_id - 3afea535-b43c-4df3-a1e9-1310edd34e90 | app.agent.nodes.validate_sql:validate_sql:34 - SQL语法正确
 2026-11-17 10:44:00.458 | INFO     | request_id - 3afea535-b43c-4df3-a1e9-1310edd34e90 | app.agent.nodes.run_sql:run_sql:29 - SQL执行结果：[{'大区': '华东', 'GMV': 107373.0}, {'大区': '华南', 'GMV': 70202.0}, {'大区': '华北', 'GMV': 41099.5}, {'大区': '西南', 'GMV': 31528.0}, {'大区': '华中', 'GMV': 28957.0}]
 2026-11-17 10:44:23.905 | INFO     | request_id - 3afea535-b43c-4df3-a1e9-1310edd34e90 | app.services.conversation_memory_service:_save_long_term:306 - 写入长期记忆：episodic=1, semantic=1
+2026-11-17 17:22:05.364 | INFO     | request_id - 869cce49-3e3c-4ea1-84e2-a9e23c5ef543 | app.agent.nodes.load_memory:load_memory:43 - 加载会话记忆：session_id=fa11a3a8-b5bb-4817-ab80-a3e3d461ace3, 历史消息=4, 长期记忆=0, 改写问题=统计2025年3月各商品品类的销量和销售额
+2026-11-17 17:22:06.124 | INFO     | request_id - 869cce49-3e3c-4ea1-84e2-a9e23c5ef543 | app.agent.nodes.extract_keywords:extract_keywords:51 - 抽取关键词成功: ['统计', '销量', '统计2025年3月各商品品类的销量和销售额', '品类', '销售额', '商品']
+2026-11-17 17:22:11.293 | INFO     | request_id - 869cce49-3e3c-4ea1-84e2-a9e23c5ef543 | app.agent.nodes.recall_value:recall_value:64 - 检索到字段取值：[]
+2026-11-17 17:22:11.811 | INFO     | request_id - 869cce49-3e3c-4ea1-84e2-a9e23c5ef543 | app.agent.nodes.recall_metric:recall_metric:66 - 检索到指标信息：['GMV', 'AOV']
+2026-11-17 17:22:11.825 | INFO     | request_id - 869cce49-3e3c-4ea1-84e2-a9e23c5ef543 | app.agent.nodes.merge_retrieved_info:merge_retrieved_info:143 - 合并后的表信息：['fact_order', 'dim_date', 'dim_product']
+2026-11-17 17:22:11.825 | INFO     | request_id - 869cce49-3e3c-4ea1-84e2-a9e23c5ef543 | app.agent.nodes.merge_retrieved_info:merge_retrieved_info:146 - 合并后的指标信息：['GMV', 'AOV']
+2026-11-17 17:22:13.727 | INFO     | request_id - 869cce49-3e3c-4ea1-84e2-a9e23c5ef543 | app.agent.nodes.filter_metric:filter_metric:54 - 过滤后的指标信息：['GMV']
+2026-11-17 17:22:13.882 | INFO     | request_id - 869cce49-3e3c-4ea1-84e2-a9e23c5ef543 | app.agent.nodes.filter_table:filter_table:60 - 过滤后的表信息：['fact_order', 'dim_product']
+2026-11-17 17:22:13.926 | INFO     | request_id - 869cce49-3e3c-4ea1-84e2-a9e23c5ef543 | app.agent.nodes.add_extra_context:add_extra_context:36 - 数据库信息：{'dialect': 'mysql', 'version': '8.0.46'}
+2026-11-17 17:22:13.926 | INFO     | request_id - 869cce49-3e3c-4ea1-84e2-a9e23c5ef543 | app.agent.nodes.add_extra_context:add_extra_context:37 - 日期信息：{'date': '2026-11-17', 'weekday': 'Tuesday', 'quarter': 'Q4'}
+2026-11-17 17:22:16.000 | INFO     | request_id - 869cce49-3e3c-4ea1-84e2-a9e23c5ef543 | app.agent.nodes.generate_sql:generate_sql:67 - 生成的SQL：SELECT dp.category AS 商品品类, SUM(fo.order_quantity) AS 销量, SUM(fo.order_amount) AS 销售额
+FROM fact_order fo
+JOIN dim_product dp ON fo.product_id = dp.product_id
+WHERE fo.date_id >= 20250301 AND fo.date_id < 20250401
+GROUP BY dp.category
+ORDER BY 销售额 DESC;
+2026-11-17 17:22:16.041 | INFO     | request_id - 869cce49-3e3c-4ea1-84e2-a9e23c5ef543 | app.agent.nodes.validate_sql:validate_sql:34 - SQL语法正确
+2026-11-17 17:22:16.058 | INFO     | request_id - 869cce49-3e3c-4ea1-84e2-a9e23c5ef543 | app.agent.nodes.run_sql:run_sql:29 - SQL执行结果：[{'商品品类': '手机数码', '销量': Decimal('10'), '销售额': 62190.0}, {'商品品类': '家用电器', '销量': Decimal('6'), '销售额': 19196.0}, {'商品品类': '鞋靴', '销量': Decimal('4'), '销售额': 4396.0}, {'商品品类': '服饰', '销量': Decimal('7'), '销售额': 2593.0}, {'商品品类': '食品饮料', '销量': Decimal('139'), '销售额': 1115.0}, {'商品品类': '休闲零食', '销量': Decimal('156'), '销售额': 630.0}]
+2026-11-17 17:22:18.485 | INFO     | request_id - 869cce49-3e3c-4ea1-84e2-a9e23c5ef543 | app.agent.nodes.generate_answer:generate_answer:102 - 分析结论：2025年3月各品类中，手机数码销售额最高，为62190元；家用电器次之，为19196元，二者明显领先其他品类。销量方面，休闲零食和食品饮料分别以156、139居前，但销售额仅630元和1115元，呈现低客单价特征。手机数码销量10，却贡献最高销售额。
+2026-11-17 17:22:23.916 | INFO     | request_id - 869cce49-3e3c-4ea1-84e2-a9e23c5ef543 | app.services.conversation_memory_service:_save_long_term:314 - 写入长期记忆：episodic=1, semantic=3

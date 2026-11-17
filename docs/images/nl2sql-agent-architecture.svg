@@ -1,0 +1,286 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="1000" viewBox="0 0 1500 1000" role="img" aria-label="NL2SQL Agent 系统架构图">
+  <defs>
+    <linearGradient id="pageBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f4faf8"/>
+      <stop offset="0.55" stop-color="#f7fbfa"/>
+      <stop offset="1" stop-color="#eef5f9"/>
+    </linearGradient>
+    <linearGradient id="brandGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#18b7a2"/>
+      <stop offset="1" stop-color="#3f83ec"/>
+    </linearGradient>
+    <linearGradient id="softTeal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e4f6f2"/>
+      <stop offset="1" stop-color="#eef4ff"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="10" stdDeviation="16" flood-color="#17322e" flood-opacity="0.08"/>
+    </filter>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+      <path d="M0 0 L9 4.5 L0 9 Z" fill="#8fb4ad"/>
+    </marker>
+    <marker id="arrowBrand" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+      <path d="M0 0 L9 4.5 L0 9 Z" fill="#18a08d"/>
+    </marker>
+    <style>
+      .title { font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 28px; font-weight: 750; fill: #17322e; letter-spacing: -0.4px; }
+      .subtitle { font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 13px; fill: #58736e; }
+      .panel-label { font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 11px; font-weight: 750; fill: #8aa19c; letter-spacing: 1.4px; }
+      .panel-note { font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 10.5px; fill: #8aa19c; }
+      .node-title { font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 12px; font-weight: 700; fill: #17322e; }
+      .node-sub { font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 9.5px; fill: #6e8983; }
+      .box-title { font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 14px; font-weight: 750; fill: #17322e; }
+      .box-text { font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 10.5px; fill: #58736e; }
+      .box-muted { font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 9.5px; fill: #8aa19c; }
+      .arrow-label { font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 9.5px; fill: #7f9b95; }
+      .badge-text { font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 11px; font-weight: 650; fill: #0b7d6e; }
+      .chip-text { font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 9.5px; font-weight: 650; fill: #0b7d6e; }
+      .letter { font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 12px; font-weight: 800; fill: #0b7d6e; }
+    </style>
+  </defs>
+
+  <rect width="1500" height="1000" fill="url(#pageBg)"/>
+
+  <!-- Header -->
+  <text x="60" y="62" class="title">NL2SQL Agent</text>
+  <text x="60" y="88" class="subtitle">自然语言问数 · 多轮记忆 · 用户隔离 · 结果解读</text>
+  <rect x="1160" y="38" width="280" height="36" rx="18" fill="#ffffff" stroke="#dfeae7"/>
+  <circle cx="1181" cy="56" r="5" fill="#18a08d"/>
+  <text x="1196" y="60" class="badge-text">Vue 3 · FastAPI · LangGraph</text>
+  <line x1="1164" y1="94" x2="1260" y2="94" stroke="#8fb4ad" stroke-width="1.6"/>
+  <text x="1268" y="98" class="box-muted">请求 / 执行流</text>
+  <line x1="1370" y1="94" x2="1420" y2="94" stroke="#8fb4ad" stroke-width="1.6" stroke-dasharray="5 4"/>
+  <text x="1428" y="98" class="box-muted">读写 / 依赖</text>
+
+  <!-- Left column: access and auth -->
+  <rect x="50" y="120" width="360" height="730" rx="20" fill="#ffffff" stroke="#dfeae7" filter="url(#shadow)"/>
+  <text x="72" y="154" class="panel-label">接入与认证层</text>
+
+  <rect x="70" y="176" width="320" height="140" rx="14" fill="#f8fbfa" stroke="#dfeae7"/>
+  <circle cx="96" cy="203" r="15" fill="url(#softTeal)"/>
+  <text x="96" y="208" class="letter" text-anchor="middle">V</text>
+  <text x="120" y="207" class="box-title">Vue 3 前端</text>
+  <text x="120" y="224" class="box-muted">Vite · TypeScript · SSE</text>
+  <text x="92" y="251" class="box-text">登录 / 注册 / 退出</text>
+  <text x="92" y="270" class="box-text">多轮对话 · 结果表格 · 业务结论</text>
+  <text x="92" y="289" class="box-text">最近会话 · 长期记忆抽屉</text>
+  <rect x="92" y="298" width="118" height="20" rx="10" fill="#e1f5f0"/>
+  <text x="151" y="312" class="chip-text" text-anchor="middle">localStorage Token</text>
+
+  <path d="M230 316 V354" stroke="#8fb4ad" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+  <text x="242" y="340" class="arrow-label">HTTPS / SSE</text>
+
+  <rect x="70" y="356" width="320" height="152" rx="14" fill="#ffffff" stroke="#dfeae7"/>
+  <circle cx="96" cy="383" r="15" fill="#e8f0ff"/>
+  <text x="96" y="388" class="letter" text-anchor="middle" style="fill:#3c6fca">F</text>
+  <text x="120" y="387" class="box-title">FastAPI API 层</text>
+  <text x="120" y="404" class="box-muted">依赖注入 · 生命周期 · 异常处理</text>
+  <text x="92" y="431" class="box-text">JWT 鉴权 · 会话归属校验</text>
+  <text x="92" y="450" class="box-text">SSE 流式返回问数过程</text>
+  <text x="92" y="469" class="box-text">会话列表 / 详情 / 删除 / 记忆查询</text>
+  <text x="92" y="488" class="box-text">注册 / 登录 / 当前用户</text>
+
+  <path d="M390 432 H450" stroke="#18a08d" stroke-width="1.8" fill="none" marker-end="url(#arrowBrand)"/>
+  <text x="388" y="421" class="arrow-label">调用 · SSE</text>
+
+  <rect x="70" y="530" width="320" height="112" rx="14" fill="#eef8f5" stroke="#cfe8e1"/>
+  <circle cx="96" cy="557" r="15" fill="#ffffff"/>
+  <text x="96" y="562" class="letter" text-anchor="middle">A</text>
+  <text x="120" y="561" class="box-title">认证与用户隔离</text>
+  <text x="92" y="585" class="box-text">scrypt 密码哈希 · HS256 JWT</text>
+  <text x="92" y="604" class="box-text">Redis 会话按 user_id 隔离</text>
+  <text x="92" y="623" class="box-text">Qdrant 长期记忆按 user_id 过滤</text>
+
+  <rect x="70" y="668" width="320" height="112" rx="14" fill="#ffffff" stroke="#dfeae7"/>
+  <text x="90" y="694" class="box-title" style="font-size:12px">用户与会话数据</text>
+  <text x="90" y="716" class="box-text">Meta MySQL：user_info 用户表</text>
+  <text x="90" y="735" class="box-text">Redis：最近 N 条短期消息 + TTL</text>
+  <text x="90" y="754" class="box-text">Qdrant：跨会话长期向量记忆</text>
+
+  <!-- Center: LangGraph workflow -->
+  <rect x="450" y="120" width="670" height="730" rx="20" fill="#ffffff" stroke="#dfeae7" filter="url(#shadow)"/>
+  <text x="472" y="154" class="panel-label">LANGGRAPH 问数工作流</text>
+  <text x="472" y="174" class="panel-note">State 贯穿节点，Runtime Context 注入检索、数据库与记忆依赖</text>
+
+  <!-- Row 1 -->
+  <rect x="470" y="200" width="130" height="54" rx="11" fill="#f2faf8" stroke="#cfe8e1"/>
+  <text x="535" y="221" class="node-title" text-anchor="middle">① 加载记忆</text>
+  <text x="535" y="239" class="node-sub" text-anchor="middle">Redis + Qdrant</text>
+
+  <path d="M600 227 H625" stroke="#8fb4ad" stroke-width="1.6" fill="none" marker-end="url(#arrow)"/>
+
+  <rect x="625" y="200" width="110" height="54" rx="11" fill="#f8fbfa" stroke="#dfeae7"/>
+  <text x="680" y="221" class="node-title" text-anchor="middle">② 抽取关键词</text>
+  <text x="680" y="239" class="node-sub" text-anchor="middle">jieba · TF-IDF</text>
+
+  <path d="M735 227 H760" stroke="#8fb4ad" stroke-width="1.6" fill="none" marker-end="url(#arrow)"/>
+
+  <rect x="760" y="200" width="190" height="54" rx="11" fill="#eef4ff" stroke="#d7e4ff"/>
+  <text x="855" y="220" class="node-title" text-anchor="middle">③ 三路召回</text>
+  <text x="855" y="238" class="node-sub" text-anchor="middle">字段 / 指标（Qdrant） · 取值（ES）</text>
+
+  <path d="M950 227 H975" stroke="#8fb4ad" stroke-width="1.6" fill="none" marker-end="url(#arrow)"/>
+
+  <rect x="975" y="200" width="125" height="54" rx="11" fill="#f8fbfa" stroke="#dfeae7"/>
+  <text x="1037" y="221" class="node-title" text-anchor="middle">④ 合并上下文</text>
+  <text x="1037" y="239" class="node-sub" text-anchor="middle">补齐主外键 / 示例值</text>
+
+  <path d="M1037 254 V280 H542 V299" stroke="#8fb4ad" stroke-width="1.6" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- Row 2 -->
+  <rect x="470" y="300" width="145" height="54" rx="11" fill="#f8fbfa" stroke="#dfeae7"/>
+  <text x="542" y="321" class="node-title" text-anchor="middle">⑤ 过滤表 / 指标</text>
+  <text x="542" y="339" class="node-sub" text-anchor="middle">LLM 选择必要字段</text>
+
+  <path d="M615 327 H640" stroke="#8fb4ad" stroke-width="1.6" fill="none" marker-end="url(#arrow)"/>
+
+  <rect x="640" y="300" width="115" height="54" rx="11" fill="#f8fbfa" stroke="#dfeae7"/>
+  <text x="697" y="321" class="node-title" text-anchor="middle">⑥ 补全环境</text>
+  <text x="697" y="339" class="node-sub" text-anchor="middle">日期 / 方言 / 版本</text>
+
+  <path d="M755 327 H780" stroke="#8fb4ad" stroke-width="1.6" fill="none" marker-end="url(#arrow)"/>
+
+  <rect x="780" y="300" width="115" height="54" rx="11" fill="#f2faf8" stroke="#cfe8e1"/>
+  <text x="837" y="321" class="node-title" text-anchor="middle">⑦ 生成 SQL</text>
+  <text x="837" y="339" class="node-sub" text-anchor="middle">表 / 指标 / 记忆注入</text>
+
+  <path d="M895 327 H920" stroke="#8fb4ad" stroke-width="1.6" fill="none" marker-end="url(#arrow)"/>
+
+  <rect x="920" y="300" width="180" height="54" rx="11" fill="#f8fbfa" stroke="#dfeae7"/>
+  <text x="1010" y="321" class="node-title" text-anchor="middle">⑧ 校验 SQL</text>
+  <text x="1010" y="339" class="node-sub" text-anchor="middle">EXPLAIN 语法 / 表字段校验</text>
+
+  <path d="M1010 354 V380 H530 V399" stroke="#8fb4ad" stroke-width="1.6" fill="none" marker-end="url(#arrow)"/>
+  <text x="772" y="374" class="arrow-label" text-anchor="middle">通过</text>
+
+  <!-- Correction branch -->
+  <path d="M1100 327 H1105 V492 H1081" stroke="#b7cfc9" stroke-width="1.5" fill="none" stroke-dasharray="5 4" marker-end="url(#arrow)"/>
+  <text x="1112" y="378" class="arrow-label">失败</text>
+  <rect x="930" y="470" width="150" height="44" rx="10" fill="#fdf3df" stroke="#f0d8a7"/>
+  <text x="1005" y="489" class="node-title" text-anchor="middle">修正 SQL</text>
+  <text x="1005" y="505" class="node-sub" text-anchor="middle">correct_sql</text>
+  <path d="M930 492 H530 V455" stroke="#b7cfc9" stroke-width="1.5" fill="none" stroke-dasharray="5 4" marker-end="url(#arrow)"/>
+  <text x="700" y="485" class="arrow-label" text-anchor="middle">修正后重新执行</text>
+
+  <!-- Row 3 -->
+  <rect x="470" y="400" width="120" height="54" rx="11" fill="#f8fbfa" stroke="#dfeae7"/>
+  <text x="530" y="421" class="node-title" text-anchor="middle">⑨ 执行 SQL</text>
+  <text x="530" y="439" class="node-sub" text-anchor="middle">DW MySQL</text>
+
+  <path d="M590 427 H615" stroke="#8fb4ad" stroke-width="1.6" fill="none" marker-end="url(#arrow)"/>
+
+  <rect x="615" y="400" width="145" height="54" rx="11" fill="#f2faf8" stroke="#cfe8e1"/>
+  <text x="687" y="421" class="node-title" text-anchor="middle">⑩ 生成业务结论</text>
+  <text x="687" y="439" class="node-sub" text-anchor="middle">LLM · 结果转人话</text>
+
+  <path d="M760 427 H785" stroke="#8fb4ad" stroke-width="1.6" fill="none" marker-end="url(#arrow)"/>
+
+  <rect x="785" y="400" width="145" height="54" rx="11" fill="#f8fbfa" stroke="#dfeae7"/>
+  <text x="857" y="421" class="node-title" text-anchor="middle">⑪ 保存记忆</text>
+  <text x="857" y="439" class="node-sub" text-anchor="middle">Redis + Qdrant</text>
+
+  <path d="M930 427 H955" stroke="#8fb4ad" stroke-width="1.6" fill="none" marker-end="url(#arrow)"/>
+
+  <rect x="955" y="400" width="145" height="54" rx="11" fill="url(#brandGrad)"/>
+  <text x="1027" y="423" class="node-title" text-anchor="middle" style="fill:#ffffff">⑫ 完成 · 返回前端</text>
+  <text x="1027" y="441" class="node-sub" text-anchor="middle" style="fill:rgba(255,255,255,0.72)">SSE answer / result</text>
+
+  <!-- Workflow notes -->
+  <rect x="470" y="570" width="630" height="74" rx="12" fill="#f8fbfa" stroke="#dfeae7"/>
+  <text x="488" y="593" class="box-title" style="font-size:12px">SSE 事件</text>
+  <text x="488" y="613" class="box-text">session · progress · result · answer · error</text>
+  <text x="488" y="632" class="box-muted">前端先展示结果表格，再用自然语言结论替换临时摘要</text>
+
+  <rect x="470" y="666" width="630" height="90" rx="12" fill="#eef8f5" stroke="#cfe8e1"/>
+  <text x="488" y="690" class="box-title" style="font-size:12px">记忆写入策略</text>
+  <text x="488" y="711" class="box-text">Redis：最近 max_messages 条消息 + TTL，保存问题、结论与 SQL</text>
+  <text x="488" y="730" class="box-text">Qdrant：episodic 问数记录 + semantic 用户偏好，按 user_id 隔离</text>
+  <text x="488" y="749" class="box-muted">写入失败自动降级，不阻断本次问数结果返回</text>
+
+  <rect x="470" y="780" width="630" height="42" rx="11" fill="#ffffff" stroke="#dfeae7"/>
+  <text x="490" y="806" class="box-muted">并行召回 → 合并 → 过滤 → SQL 闭环 → 自然语言结论 → 记忆持久化</text>
+
+  <!-- Right: data and model services -->
+  <rect x="1150" y="120" width="300" height="730" rx="20" fill="#ffffff" stroke="#dfeae7" filter="url(#shadow)"/>
+  <text x="1172" y="154" class="panel-label">存储与模型服务</text>
+
+  <path d="M1120 500 H1149" stroke="#b7cfc9" stroke-width="1.6" fill="none" stroke-dasharray="5 4" marker-end="url(#arrow)"/>
+
+  <rect x="1170" y="176" width="260" height="82" rx="12" fill="#f8fbfa" stroke="#dfeae7"/>
+  <rect x="1170" y="176" width="4" height="82" rx="2" fill="#18a08d"/>
+  <text x="1190" y="201" class="box-title" style="font-size:13px">Meta MySQL</text>
+  <text x="1190" y="220" class="box-text">user_info 用户与认证</text>
+  <text x="1190" y="238" class="box-text">表 / 字段 / 指标元数据</text>
+
+  <rect x="1170" y="274" width="260" height="70" rx="12" fill="#f8fbfa" stroke="#dfeae7"/>
+  <rect x="1170" y="274" width="4" height="70" rx="2" fill="#3f83ec"/>
+  <text x="1190" y="299" class="box-title" style="font-size:13px">DW MySQL</text>
+  <text x="1190" y="318" class="box-text">fact_order · dim_region</text>
+  <text x="1190" y="334" class="box-text">订单 / 地区 / 商品 / 日期</text>
+
+  <rect x="1170" y="360" width="260" height="96" rx="12" fill="#f2faf8" stroke="#cfe8e1"/>
+  <rect x="1170" y="360" width="4" height="96" rx="2" fill="#18a08d"/>
+  <text x="1190" y="385" class="box-title" style="font-size:13px">Qdrant</text>
+  <text x="1190" y="404" class="box-text">字段 / 指标向量集合</text>
+  <text x="1190" y="422" class="box-text">conversation_memory_collection</text>
+  <text x="1190" y="440" class="box-muted">长期问数记录与用户偏好</text>
+
+  <rect x="1170" y="472" width="260" height="76" rx="12" fill="#f8fbfa" stroke="#dfeae7"/>
+  <rect x="1170" y="472" width="4" height="76" rx="2" fill="#d98b16"/>
+  <text x="1190" y="497" class="box-title" style="font-size:13px">Elasticsearch</text>
+  <text x="1190" y="516" class="box-text">value_index 字段取值全文索引</text>
+  <text x="1190" y="534" class="box-muted">地区 / 品类 / 会员等级等真实值</text>
+
+  <rect x="1170" y="564" width="260" height="76" rx="12" fill="#f8fbfa" stroke="#dfeae7"/>
+  <rect x="1170" y="564" width="4" height="76" rx="2" fill="#d95252"/>
+  <text x="1190" y="589" class="box-title" style="font-size:13px">Redis</text>
+  <text x="1190" y="608" class="box-text">最近 N 条短期会话消息</text>
+  <text x="1190" y="626" class="box-muted">会话索引 · TTL 自动过期</text>
+
+  <rect x="1170" y="656" width="260" height="92" rx="12" fill="#eef4ff" stroke="#d7e4ff"/>
+  <rect x="1170" y="656" width="4" height="92" rx="2" fill="#3f83ec"/>
+  <text x="1190" y="681" class="box-title" style="font-size:13px">TEI + LLM</text>
+  <text x="1190" y="700" class="box-text">bge-large-zh-v1.5 · 1024 维</text>
+  <text x="1190" y="718" class="box-text">OpenAI 兼容对话模型</text>
+  <text x="1190" y="736" class="box-muted">关键词扩展 · 过滤 · SQL · 结论</text>
+
+  <rect x="1170" y="764" width="260" height="58" rx="12" fill="#f8fbfa" stroke="#dfeae7"/>
+  <text x="1190" y="787" class="box-title" style="font-size:12px">用户级隔离</text>
+  <text x="1190" y="805" class="box-muted">会话 / 记忆查询均按 JWT user_id 过滤</text>
+
+  <!-- Bottom: metadata build pipeline -->
+  <rect x="50" y="875" width="1400" height="95" rx="18" fill="#ffffff" stroke="#dfeae7"/>
+  <text x="72" y="906" class="panel-label">元数据知识构建</text>
+
+  <rect x="220" y="891" width="160" height="48" rx="10" fill="#f8fbfa" stroke="#dfeae7"/>
+  <text x="300" y="912" class="node-title" text-anchor="middle">meta_config.yaml</text>
+  <text x="300" y="929" class="node-sub" text-anchor="middle">表 / 字段 / 指标配置</text>
+
+  <path d="M380 915 H416" stroke="#8fb4ad" stroke-width="1.6" fill="none" marker-end="url(#arrow)"/>
+
+  <rect x="416" y="891" width="190" height="48" rx="10" fill="#f2faf8" stroke="#cfe8e1"/>
+  <text x="511" y="912" class="node-title" text-anchor="middle">build_meta_knowledge</text>
+  <text x="511" y="929" class="node-sub" text-anchor="middle">构建元数据知识库</text>
+
+  <rect x="642" y="891" width="130" height="48" rx="10" fill="#f8fbfa" stroke="#dfeae7"/>
+  <text x="707" y="912" class="node-title" text-anchor="middle">Meta MySQL</text>
+  <text x="707" y="929" class="node-sub" text-anchor="middle">结构化元数据</text>
+
+  <rect x="786" y="891" width="130" height="48" rx="10" fill="#f8fbfa" stroke="#dfeae7"/>
+  <text x="851" y="912" class="node-title" text-anchor="middle">Qdrant</text>
+  <text x="851" y="929" class="node-sub" text-anchor="middle">字段 / 指标向量</text>
+
+  <rect x="930" y="891" width="150" height="48" rx="10" fill="#f8fbfa" stroke="#dfeae7"/>
+  <text x="1005" y="912" class="node-title" text-anchor="middle">Elasticsearch</text>
+  <text x="1005" y="929" class="node-sub" text-anchor="middle">字段取值索引</text>
+
+  <path d="M511 939 V955" stroke="#8fb4ad" stroke-width="1.6" fill="none"/>
+  <path d="M511 955 H1005" stroke="#8fb4ad" stroke-width="1.6" fill="none"/>
+  <path d="M707 955 V939" stroke="#8fb4ad" stroke-width="1.6" fill="none" marker-end="url(#arrow)"/>
+  <path d="M851 955 V939" stroke="#8fb4ad" stroke-width="1.6" fill="none" marker-end="url(#arrow)"/>
+  <path d="M1005 955 V939" stroke="#8fb4ad" stroke-width="1.6" fill="none" marker-end="url(#arrow)"/>
+
+  <text x="1110" y="906" class="box-title" style="font-size:12px">Docker Compose 基础服务</text>
+  <text x="1110" y="926" class="box-text">MySQL · Redis · Qdrant · Elasticsearch · TEI</text>
+  <text x="1110" y="945" class="box-muted">Kibana 用于调试全文索引</text>
+</svg>

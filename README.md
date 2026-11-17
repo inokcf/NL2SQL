@@ -1,256 +1,220 @@
-<div align='center'>
-  <h1 style="margin-top: 15px;">「电商问数」智能数据分析 Agent</h1>
-  <h4><b>shopkeeper-agent</b></h4>
-  <p><em>可能是全网最适合用于系统学习 LangGraph 的智能问数实战项目，配套系统性文字教程与对应章节分支，带你打通混合检索、多阶段推理、SQL 生成与执行全链路</em></p>
-</div>
+<div align="center">
 
-<div align='center'>
+<h1>「AI问数」NL2SQL Agent</h1>
 
-![AI](https://img.shields.io/badge/AI-Agent-00c853?style=flat)
-![Python](https://img.shields.io/badge/Python-3.14-3776AB.svg?logo=python&logoColor=white)
-![LangGraph](https://img.shields.io/badge/LangGraph-Agentic%20Workflow-1C3C3C.svg)
-![Stars](https://img.shields.io/github/stars/didilili/shopkeeper-agent?logo=github&style=flat)
-[![Read Online](https://img.shields.io/badge/在线教程-点击访问-blue?logo=bookstack)](https://didilili.github.io/ai-agents-from-zero/#/%E5%AE%9E%E6%88%98%E9%A1%B9%E7%9B%AE-%E7%94%B5%E5%95%86%E9%97%AE%E6%95%B0/0-%E5%89%8D%E8%A8%80)
+<p><em>基于 LangGraph 的自然语言问数系统：混合检索 · 多轮记忆 · 用户隔离 · SQL 执行与业务结论</em></p>
 
 </div>
 
-**📢 说明**：本套实战项目已更新完成，配套教程、章节分支和前后端代码均可对照学习。
+<div align="center">
 
-如果你正在找一个适合学习 `LangGraph`、`Qdrant`、`MySQL`、`FastAPI` 和 AI Agent 工程开发的实战项目，「电商问数」很可能是最适合你的项目。
+![Python](https://img.shields.io/badge/Python-3.14-3776AB?logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.135-009688?logo=fastapi&logoColor=white)
+![Vue](https://img.shields.io/badge/Vue-3.5-42B883?logo=vuedotjs&logoColor=white)
+![LangGraph](https://img.shields.io/badge/LangGraph-1.1-1C3C3C)
+![Redis](https://img.shields.io/badge/Redis-7.4-DC382D?logo=redis&logoColor=white)
+![Qdrant](https://img.shields.io/badge/Qdrant-1.16-DC244C)
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
 
-它不是只调用一次大模型接口，也不是写几个 Prompt 演示 SQL 生成结果。这个项目围绕电商数仓问数场景，先构建元数据知识库，再做字段、指标、字段取值的混合检索，随后用 LangGraph 编排多阶段问数流程，完成 SQL 生成、校验、修正、执行和前端流式展示。换句话说，你学到的不是某一个框架 API，而是一条 AI 应用从数据准备、检索增强、智能体编排、接口交付到前端联调的完整项目主线。
+</div>
 
-> 本套仓库是 [ai-agents-from-zero](https://github.com/didilili/ai-agents-from-zero) 教程体系中的 [实战项目-电商问数](https://github.com/didilili/ai-agents-from-zero/tree/main/%E5%AE%9E%E6%88%98%E9%A1%B9%E7%9B%AE-%E7%94%B5%E5%95%86%E9%97%AE%E6%95%B0) 配套源码仓库，除了可直接运行和二次开发的项目代码之外，也提供了与教程章节对应的 Git 分支演进过程，以及完整的在线图文讲义入口。
-> 如果你想系统学习「AI智能体 大模型应用开发」，也可直接从系统教程 [AI 智能体实战速成指南-大模型入门](https://didilili.github.io/ai-agents-from-zero/#/) 开始。
+## 🖼️ 系统截图
 
-![电商问数前端首页：样例问题、自然语言输入和智能数据分析 Agent 界面](docs/images/shopkeeper-agent-home.jpg)
+<p align="center">
+  <img src="docs/images/nl2sql-agent-login.png" alt="登录与注册页面" width="49%" />
+  <img src="docs/images/nl2sql-agent-home.png" alt="多轮问数首页" width="49%" />
+</p>
+<p align="center"><em>登录与注册 · 多轮问数首页</em></p>
 
-## 📖 项目介绍
+<p align="center">
+  <img src="docs/images/nl2sql-agent-result.png" alt="查询结果、自然语言结论与执行过程" width="100%" />
+</p>
+<p align="center"><em>执行过程、查询结果表格与自然语言分析结论</em></p>
 
-在真实问数场景里，业务同学通常不会写 SQL，数据分析同学也很难随时记住所有表结构、字段含义、指标口径和字段取值。单纯把自然语言问题直接交给大模型，很容易出现表选错、字段选错、指标理解错和 SQL 幻觉等问题。
+## 📖 项目简介
 
-`电商问数` 要解决的就是这个问题：
+`NL2SQL Agent` 是一个可直接运行的AI问数系统。用户登录后，用自然语言提出问题，系统会先加载多轮会话和长期记忆，再围绕问题完成字段、指标和字段取值的混合检索，随后通过 LangGraph 编排 SQL 生成、校验、修正与执行，最后把结构化结果转换成业务用户能直接看懂的自然语言结论，并通过 SSE 实时返回前端。
 
-- 用户用自然语言提问
-- 系统自动召回相关字段、指标和字段取值
-- 大模型基于上下文进行分步推理
-- 生成 SQL 并查询数据仓库
-- 以流式方式返回分析结果
+它不是一个“把问题直接丢给大模型生成 SQL”的示例，而是一条完整的工程链路：
 
-## ✨ 项目亮点
+- **元数据知识库**：表、字段、指标和真实取值分别进入 MySQL、Qdrant 与 Elasticsearch
+- **混合检索**：Qdrant 负责字段/指标语义召回，Elasticsearch 负责取值全文检索
+- **多轮记忆**：Redis 保存短期消息，Qdrant 保存跨会话的长期向量记忆
+- **用户体系**：JWT 登录、scrypt 密码哈希、会话与记忆按用户隔离
+- **结果解读**：SQL 执行后生成自然语言业务结论，并同步写入会话记忆
+- **流式交互**：Vue 3 前端通过 SSE 展示节点进度、查询结果和最终回答
 
-- **检索 + 推理 + 生成，而不是模型直出 SQL**
-    - 先围绕问题召回相关字段、指标和值域，再组织上下文生成 SQL，整体链路更稳、更可控。
-- **面向企业问数场景的混合检索**
-    - `Qdrant` 负责字段和指标的语义召回。
-    - `Elasticsearch` 负责字段取值的全文检索。
-    - `MySQL` 负责保存完整、权威的结构化元数据。
-- **支持字段、指标、取值三类信息协同召回**
-    - 比单纯做表级或字段级检索更贴近真实企业分析流程。
-- **从检索到执行的完整可运行链路**
-    - 不停留在 Prompt 设计，而是会真实生成 SQL、执行查询，并以流式方式返回结果。
-- **SQL 结果转业务结论**
-    - 查询完成后结合用户问题生成自然语言回答，让非技术用户也能直接看懂数据。
-- **工程化后端结构清晰**
-    - 基于 `FastAPI + LangGraph + Repository + Client Manager` 组织配置、客户端、仓储层、服务层与智能体流程，便于维护和扩展。
-- **不仅有实战代码，还有完整配套教程文档**
-    - 项目配有一套系统化、持续更新、完全免费的教程讲义，适合按章节从数仓基础、元数据知识库到问数智能体流程逐步学习。
-- **兼顾学习价值与可扩展性**
-    - 既可以按教程章节逐步理解，也可以在此基础上继续扩展权限控制、SQL 审核、结果可视化等能力。
+## ✨ 核心能力
 
-这套课程十分适合这些场景：
-
-- 想系统学习 `LangGraph`，但不想只停留在几个玩具节点。
-- 想把 `MySQL`、`Qdrant`、`Elasticsearch` 和大模型放到同一个业务场景里理解。
-- 想做一个比简单模型调用更接近实际开发的 AI Agent 项目。
-- 想把项目写进简历，并且能说清楚数据层、检索层、智能体层、服务层和前端层分别做了什么。
+- **混合检索而非模型直出**
+  - 先召回相关字段、指标和值域，再组织上下文生成 SQL，降低选错表、选错字段和理解错指标的概率。
+- **完整的 SQL 闭环**
+  - 包含 SQL 生成、`EXPLAIN` 校验、失败修正和最终执行。
+- **自然语言结果解读**
+  - `generate_answer` 节点结合用户问题、指标口径和查询结果生成业务结论，不再只返回一张表。
+- **多轮问数与会话管理**
+  - 自动把“那上个月呢”“再按品类拆一下”等追问改写为独立问题。
+  - 支持最近会话、会话详情、删除会话和记忆查看。
+- **短期 + 长期记忆**
+  - Redis 保存最近 N 条消息并设置 TTL；Qdrant 保存问数记录和抽取出的用户偏好。
+- **登录与数据隔离**
+  - 注册、登录、退出、当前用户查询；会话和长期记忆都按登录用户 id 隔离。
+- **清爽的 Vue 前端**
+  - 登录页、问数首页、执行过程、结果表格、自然语言结论、会话列表和记忆抽屉。
+- **工程化后端结构**
+  - `FastAPI + LangGraph + Repository + Service + Client Manager`，配置、日志、依赖注入和生命周期管理清晰。
 
 ## 🏗️ 系统架构
 
-![电商问数系统架构图：前端通过 FastAPI 和 SSE 连接后端，LangGraph 问数智能体基于 Jieba、MySQL、Qdrant、Elasticsearch 和 LLM 完成召回、SQL 生成校验执行与结果返回](docs/images/shopkeeper-agent-system-architecture.svg)
+![NL2SQL Agent 系统架构图](docs/images/nl2sql-agent-architecture.svg)
 
-项目围绕两条主线展开：
+系统分为四层：
 
-| 主线             | 做什么                                                                   | 涉及模块                                     |
-| ---------------- | ------------------------------------------------------------------------ | -------------------------------------------- |
-| 元数据知识库构建 | 抽取教学数仓中的表、字段、指标和字段取值，写入结构化库、向量库和全文索引 | `MySQL` / `Qdrant` / `Elasticsearch` / `TEI` |
-| 自然语言问数     | 基于用户问题完成召回、上下文整理、SQL 生成校验执行，并把过程流式返回前端 | `LangGraph` / `FastAPI` / `SSE` / `Vue`      |
+| 层级 | 主要职责 |
+| --- | --- |
+| 接入与认证层 | Vue 3 前端、FastAPI API、JWT 鉴权、SSE 流式返回、会话接口 |
+| Agent 编排层 | LangGraph 状态图、多路召回、上下文合并、SQL 闭环、结论生成、记忆持久化 |
+| 存储与模型层 | Meta MySQL、DW MySQL、Qdrant、Elasticsearch、Redis、TEI Embedding、LLM |
+| 元数据构建层 | 从 `meta_config.yaml` 构建表/字段/指标/取值索引 |
 
-![电商问数查询结果页：LangGraph 执行流程、SQL 校验执行和查询结果表格](docs/images/shopkeeper-agent-query-result.jpg)
+### Agent 工作流
 
-## 🧠 多轮会话与记忆
-
-在原有单轮问数链路之外，新增了 Redis 短期会话记忆和 Qdrant 长期向量记忆：
-
-| 记忆层 | 存储 | 内容 | 生命周期 |
-| --- | --- | --- | --- |
-| 短期会话 | Redis List | 最近 N 条问答消息、SQL 和改写后问题 | 每次追问刷新 TTL，默认 30 分钟 |
-| 长期记忆 | Qdrant | 历史问数记录和抽取出的用户偏好/口径 | 持久保存，按 user_id 隔离 |
-
-执行流程：
-
-1. `load_memory` 读取 Redis 最近消息和 Qdrant 语义记忆，把“那上个月呢”等追问改写成独立问题。
-2. 后续召回、过滤和 SQL 生成节点统一使用改写后的问题。
-3. 长期记忆以 `- [历史问数] ...` / `- [长期偏好] ...` 形式注入 `generate_sql` 提示词。
-4. `run_sql` 执行查询后，`generate_answer` 结合用户问题和结果数据生成自然语言业务结论，并通过 SSE `answer` 事件返回前端。
-5. `persist_memory` 把本轮问答和自然语言结论写回 Redis，并把 Embedding 后的问数记录和可复用偏好写入 Qdrant。
-
-配置位于 `conf/app_config.yaml`：
-
-```yaml
-redis:
-  host: localhost
-  port: 6380
-  password: dili123
-  session_ttl_seconds: 604800  # 短期会话 TTL，默认 7 天
-  max_messages: 20             # 每个会话保留的最近消息数
-
-memory:
-  long_term_enabled: true
-  long_term_top_k: 5
-  long_term_score_threshold: 0.55
-  extraction_enabled: true
+```text
+load_memory
+  → extract_keywords
+  → recall_column / recall_value / recall_metric（并行）
+  → merge_retrieved_info
+  → filter_table / filter_metric
+  → add_extra_context
+  → generate_sql
+  → validate_sql
+       ├─ 校验失败 → correct_sql → run_sql
+       └─ 校验通过 → run_sql
+  → generate_answer
+  → persist_memory
+  → END
 ```
 
-会话管理接口（均需登录 Token）：
+关键节点说明：
 
-- `POST /api/sessions` 创建会话
-- `GET /api/sessions` 当前用户的会话列表
-- `GET /api/sessions/{session_id}` 会话详情（最近消息）
-- `GET /api/sessions/{session_id}/memories` 查看该会话写入的长期记忆
-- `DELETE /api/sessions/{session_id}` 删除会话及其长期记忆
+- `load_memory`：读取 Redis 短期消息和 Qdrant 长期记忆，完成指代改写
+- `recall_*`：字段和指标走向量检索，字段取值走全文检索
+- `merge_retrieved_info`：补齐主外键、字段示例值和表结构上下文
+- `generate_answer`：把 SQL 结果转成自然语言业务结论
+- `persist_memory`：把问题、结论、SQL 和偏好写回 Redis / Qdrant
 
-`POST /api/query` 支持 `session_id`；不传时后端自动创建，并通过 SSE 的 `session` 事件返回。
-用户身份从登录 Token 中获取，前端不再传递 `user_id`。
+## 🛠️ 技术栈
 
-## 🔐 用户登录与数据隔离
-
-- 用户信息保存在 Meta MySQL 的 `user_info` 表
-- 密码使用标准库 `hashlib.scrypt` 加盐哈希，不保存明文
-- 登录成功后签发 HS256 JWT，前端通过 `Authorization: Bearer <token>` 访问受保护接口
-- Redis 短期会话和 Qdrant 长期记忆都以登录用户 id 作为隔离键
-- 会话详情、删除和记忆查询都会校验会话归属，不能访问其他用户的会话
-- 首次启动会自动创建体验账号：`admin` / `admin123`
-
-认证接口：
-
-- `POST /api/auth/register` 注册并返回 Token
-- `POST /api/auth/login` 登录并返回 Token
-- `GET /api/auth/me` 获取当前登录用户
-
-认证配置：
-
-```yaml
-auth:
-  secret_key: ${oc.env:AUTH_SECRET_KEY,dev-only-secret-change-me-please-32-bytes}
-  algorithm: HS256
-  token_expire_minutes: 10080  # 默认 7 天
-```
-
-生产环境请通过 `AUTH_SECRET_KEY` 环境变量设置足够长的随机密钥，并替换默认体验账号密码。
-前端为方便本地演示将 Token 保存在 `localStorage`，正式项目可改为 HttpOnly Cookie + 刷新 Token 方案。
-
-## 🛠️ 项目技术栈
-
-| 模块       | 技术                              | 作用                                           |
-| ---------- | --------------------------------- | ---------------------------------------------- |
-| 教学数仓   | `MySQL`                           | 模拟事实表、维度表和分析型查询环境             |
-| 元数据库   | `MySQL` / `SQLAlchemy`            | 保存表、字段、指标、字段指标关系等结构化元数据 |
-| 向量检索   | `Qdrant`                          | 保存字段、指标和长期记忆向量，支持语义召回     |
-| 全文检索   | `Elasticsearch`                   | 保存字段真实取值，支持关键词和值域检索         |
-| 短期会话   | `Redis`                           | 保存最近 N 条多轮消息，并通过 TTL 自动过期     |
-| Embedding  | `TEI` / `BAAI/bge-large-zh-v1.5`  | 将字段、指标、问题等文本转成向量               |
-| 智能体编排 | `LangGraph`                       | 组织多阶段问数工作流                           |
-| 模型接入   | `LangChain`                       | 封装 LLM 与 Embedding 调用                     |
-| 后端接口   | `FastAPI`                         | 提供问数 API、依赖注入和生命周期管理           |
-| 登录认证   | `PyJWT` / `scrypt`                | JWT 登录、密码哈希与接口鉴权                   |
-| 流式协议   | `SSE`                             | 实时返回节点进度、查询结果和错误消息           |
-| 前端       | `Vue 3` / `Vite` / `TypeScript`   | 提供聊天式问数界面、会话管理和记忆查看         |
-| 日志追踪   | `ContextVar` / `loguru`           | 为并发请求注入 request_id，便于排查链路        |
-| 依赖管理   | `uv` / `npm`                      | 管理 Python 后端和前端依赖                     |
+| 模块 | 技术 | 作用 |
+| --- | --- | --- |
+| 前端 | Vue 3 / Vite / TypeScript | 登录、问数、会话管理、执行过程和结果展示 |
+| 后端 | FastAPI | 认证、问数、会话接口、依赖注入和 SSE |
+| Agent 编排 | LangGraph / LangChain | 多阶段问数工作流和模型调用 |
+| 关系数据库 | MySQL / SQLAlchemy | 元数据、用户信息和教学数仓 |
+| 向量检索 | Qdrant | 字段、指标和长期记忆向量 |
+| 全文检索 | Elasticsearch | 字段真实取值索引 |
+| 短期记忆 | Redis | 最近 N 条会话消息、会话索引和 TTL |
+| Embedding | TEI / `BAAI/bge-large-zh-v1.5` | 中文文本向量化 |
+| 登录认证 | PyJWT / scrypt | JWT、密码哈希和用户隔离 |
+| 流式协议 | SSE | 节点进度、结果、业务结论和错误消息 |
+| 日志追踪 | loguru / ContextVar | request_id 链路日志 |
+| 基础设施 | Docker Compose | MySQL、Redis、Qdrant、Elasticsearch、TEI |
+| 依赖管理 | pip / npm | Python 与前端依赖 |
 
 ## 📁 项目结构
 
 ```text
-shopkeeper-agent/
+NL2SQL/
 ├── app/
-│   ├── agent/            # LangGraph 图、状态、上下文和各类节点
-│   ├── api/              # FastAPI 路由、依赖注入、生命周期和请求结构
-│   ├── clients/          # MySQL、Qdrant、Elasticsearch、Redis、Embedding 客户端管理
-│   ├── conf/             # 配置 dataclass 与配置加载工具
-│   ├── core/             # 日志、request_id、JWT 与密码安全等通用能力
-│   ├── entities/         # 更贴近业务语义的数据对象
+│   ├── agent/            # LangGraph 图、State、Runtime Context 和节点
+│   ├── api/              # FastAPI 路由、依赖注入、生命周期和 Schema
+│   ├── clients/          # MySQL / Redis / Qdrant / ES / Embedding 客户端管理
+│   ├── conf/             # 配置 dataclass 与加载逻辑
+│   ├── core/             # 日志、request_id、JWT 与密码安全
+│   ├── entities/         # 业务实体
 │   ├── models/           # SQLAlchemy ORM 模型
 │   ├── prompt/           # Prompt 加载工具
-│   ├── repositories/     # MySQL、Qdrant、Elasticsearch、Redis 数据访问层
+│   ├── repositories/     # MySQL / Qdrant / Elasticsearch / Redis 仓储
 │   ├── scripts/          # 元数据知识库构建脚本
-│   └── services/         # 元数据构建、问数查询、会话管理和记忆服务
-├── conf/                 # app_config.yaml、meta_config.yaml
-├── docker/               # Docker Compose、MySQL 初始化 SQL、ES 插件、Embedding 挂载目录
-├── frontend/             # Vue 3 + Vite + TypeScript 前端项目
-├── prompts/              # SQL 生成、修正、过滤等 Prompt 模板
-├── main.py               # FastAPI 应用入口
-└── pyproject.toml        # Python 项目依赖与工具配置
+│   └── services/         # 认证、问数、会话与记忆服务
+├── conf/                 # app_config.yaml / meta_config.yaml
+├── docker/               # Docker Compose、MySQL 初始化、ES、Embedding 挂载
+├── docs/images/          # 架构图与系统截图
+├── frontend/             # Vue 3 + Vite + TypeScript 前端
+├── prompts/              # 问数链路 Prompt
+├── main.py               # FastAPI 入口
+├── pyproject.toml        # 项目元数据与工具配置
+├── requirements.txt      # 后端运行时依赖
+└── requirements-dev.txt  # 开发与代码检查依赖
 ```
 
 ## 🚀 快速开始
 
-当前仓库已经包含一套可直接启动的本地开发环境，你可以按照以下顺序启动项目。
+### 1. 环境要求
 
-### 1. 准备环境
-
-- Python `>= 3.14`
-- `uv`
+- Python `>= 3.14`（建议使用 conda 或 venv 虚拟环境）
+- `pip`
 - Docker 与 Docker Compose
 - Node.js 与 `npm`
 
-### 2. 克隆项目
+### 2. 获取代码
 
 ```bash
-git clone https://github.com/didilili/shopkeeper-agent.git
-cd shopkeeper-agent
+git clone https://github.com/inokcf/NL2SQL.git
+cd NL2SQL
 ```
 
 ### 3. 安装后端依赖
 
+在已激活的 Python 环境中执行：
+
 ```bash
-uv sync
+python -m pip install -r requirements.txt
 ```
 
-### 4. 配置大模型 API Key
+如需运行代码检查或 pre-commit，再安装开发依赖：
+
+```bash
+python -m pip install -r requirements-dev.txt
+```
+
+### 4. 配置环境变量
 
 ```bash
 cp .env.example .env
 ```
 
-把 `.env` 中的 `LLM_API_KEY` 替换成真实密钥：
+编辑 `.env`：
 
 ```bash
+# 大模型 API Key
 LLM_API_KEY=your_real_api_key
+
+# JWT 签名密钥，生产环境请使用至少 32 字节的随机字符串
+AUTH_SECRET_KEY=change-me-to-a-random-string-at-least-32-bytes
 ```
 
-默认配置使用兼容 OpenAI 接口的硅基流动服务：
+默认模型配置使用兼容 OpenAI 协议的 DeepSeek：
 
 ```yaml
 llm:
-    model_name: Pro/zai-org/GLM-5.1
-    api_key: ${oc.env:LLM_API_KEY}
-    base_url: https://api.siliconflow.cn/v1
+  model_name: deepseek-v4-flash
+  api_key: ${oc.env:LLM_API_KEY}
+  base_url: https://api.deepseek.com
 ```
 
-如需使用其他兼容 OpenAI API 的模型平台，修改 [conf/app_config.yaml](conf/app_config.yaml) 中的 `model_name` 和 `base_url`。
+如需切换其他模型平台，修改 [conf/app_config.yaml](conf/app_config.yaml) 中的 `model_name` 和 `base_url`。
 
 ### 5. 准备 Embedding 模型
 
-项目通过 `TEI` 加载 `BAAI/bge-large-zh-v1.5`。模型文件体积较大，无法再仓库中进行提交，需要先下载到 Docker 挂载目录：
+项目通过 TEI 加载 `BAAI/bge-large-zh-v1.5`。`huggingface-hub` 已包含在 `requirements.txt` 中，安装完依赖后执行：
 
 ```bash
-uv run hf download BAAI/bge-large-zh-v1.5 --local-dir docker/embedding/bge-large-zh-v1.5
+hf download BAAI/bge-large-zh-v1.5 \
+  --local-dir docker/embedding/bge-large-zh-v1.5
 ```
 
-如果手动下载，请解压到：`docker/embedding/bge-large-zh-v1.5`路径下。
-
-### 6. 启动 Docker 基础服务
+### 6. 启动基础服务
 
 ```bash
 docker compose -f docker/docker-compose.yaml up -d
@@ -258,51 +222,40 @@ docker compose -f docker/docker-compose.yaml up -d
 
 默认端口：
 
-| 服务          | 端口   |
-| ------------- | ------ |
-| MySQL         | `3306` |
-| Elasticsearch | `9200` |
-| Kibana        | `5601` |
-| Qdrant        | `6333` |
-| Embedding     | `8081` |
+| 服务 | 地址 |
+| --- | --- |
+| MySQL | `localhost:3307` |
+| Redis | `localhost:6380` |
+| Qdrant HTTP | `http://localhost:6335` |
+| Elasticsearch | `http://localhost:9201` |
+| Kibana | `http://localhost:5601` |
+| Embedding (TEI) | `http://localhost:8082` |
 
-> `docker/mysql/meta.sql` 和 `docker/mysql/dw.sql` 会在 MySQL 容器首次启动时自动初始化元数据库和教学数仓。
+> MySQL 首次启动会自动执行 `docker/mysql/meta.sql` 和 `dw.sql`。
+> 已有数据库无需重建，后端启动时会自动补建 `user_info` 用户表。
 
 ### 7. 构建元数据知识库
 
 ```bash
-uv run python -m app.scripts.build_meta_knowledge -c conf/meta_config.yaml
+python -m app.scripts.build_meta_knowledge -c conf/meta_config.yaml
 ```
 
-这一步会把表字段元数据写入 MySQL，把字段和指标向量写入 Qdrant，并把字段真实取值写入 Elasticsearch。
+该步骤会：
+
+- 把表、字段、指标写入 Meta MySQL
+- 把字段和指标向量写入 Qdrant
+- 把字段真实取值写入 Elasticsearch
 
 ### 8. 启动后端
 
 ```bash
-uv run fastapi dev main.py
+python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-后端接口：
+首次启动会自动创建体验账号（用户表为空时）：
 
-```text
-POST http://127.0.0.1:8000/api/query
-```
-
-请求示例：
-
-```json
-{
-    "query": "统计华北地区的销售总额"
-}
-```
-
-SSE 消息类型：
-
-| 类型       | 含义         |
-| ---------- | ------------ |
-| `progress` | 节点执行进度 |
-| `result`   | 最终查询结果 |
-| `error`    | 全局异常消息 |
+- 用户名：`admin`
+- 密码：`admin123`
 
 ### 9. 启动前端
 
@@ -312,7 +265,9 @@ npm install
 npm run dev
 ```
 
-前端默认通过 Vite 代理把 `/api` 转发到 `http://127.0.0.1:8000`。如需修改：
+访问 `http://127.0.0.1:5173`，使用体验账号登录，或注册新账号。
+
+前端默认把 `/api` 代理到 `http://127.0.0.1:8000`。如需修改：
 
 ```bash
 cd frontend
@@ -323,52 +278,155 @@ cp .env.example .env
 VITE_DEV_PROXY_TARGET=http://127.0.0.1:8000
 ```
 
-## 📚 配套教程目录
+## ⚙️ 配置说明
 
-教程总入口：[电商问数完整教程](https://didilili.github.io/ai-agents-from-zero/#/%E5%AE%9E%E6%88%98%E9%A1%B9%E7%9B%AE-%E7%94%B5%E5%95%86%E9%97%AE%E6%95%B0/0-%E5%89%8D%E8%A8%80)
+主要配置位于 [conf/app_config.yaml](conf/app_config.yaml)：
 
-| 章节 | 标题                                                                                                                                                                                                                                                                              | 学习重点                                                                 | 对应分支                           |
-| ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ | ---------------------------------- |
-| 0    | [前言](https://didilili.github.io/ai-agents-from-zero/#/%E5%AE%9E%E6%88%98%E9%A1%B9%E7%9B%AE-%E7%94%B5%E5%95%86%E9%97%AE%E6%95%B0/0-%E5%89%8D%E8%A8%80)                                                                                                                           | 项目定位、学习价值与能力边界                                             | `-`                                |
-| 1    | [项目概述与数仓基础](https://didilili.github.io/ai-agents-from-zero/#/%E5%AE%9E%E6%88%98%E9%A1%B9%E7%9B%AE-%E7%94%B5%E5%95%86%E9%97%AE%E6%95%B0/1-%E9%A1%B9%E7%9B%AE%E6%A6%82%E8%BF%B0%E4%B8%8E%E6%95%B0%E4%BB%93%E5%9F%BA%E7%A1%80)                                              | 业务库、数仓、事实表、维度表与教学数仓设计                               | `-`                                |
-| 2    | [项目整体架构与智能体流程](https://didilili.github.io/ai-agents-from-zero/#/%E5%AE%9E%E6%88%98%E9%A1%B9%E7%9B%AE-%E7%94%B5%E5%95%86%E9%97%AE%E6%95%B0/2-%E9%A1%B9%E7%9B%AE%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84%E4%B8%8E%E6%99%BA%E8%83%BD%E4%BD%93%E6%B5%81%E7%A8%8B)             | MySQL、Qdrant、Elasticsearch、LLM 与 Agent 工作流如何协作                | `-`                                |
-| 3    | [开发环境与基础服务准备](https://didilili.github.io/ai-agents-from-zero/#/%E5%AE%9E%E6%88%98%E9%A1%B9%E7%9B%AE-%E7%94%B5%E5%95%86%E9%97%AE%E6%95%B0/3-%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E4%B8%8E%E5%9F%BA%E7%A1%80%E6%9C%8D%E5%8A%A1%E5%87%86%E5%A4%87)                        | uv、Docker Compose、MySQL、Qdrant、Elasticsearch、Kibana、Embedding 服务 | `03-env-services`                  |
-| 4    | [项目结构与基础服务配置管理](https://didilili.github.io/ai-agents-from-zero/#/%E5%AE%9E%E6%88%98%E9%A1%B9%E7%9B%AE-%E7%94%B5%E5%95%86%E9%97%AE%E6%95%B0/4-%E9%A1%B9%E7%9B%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E5%9F%BA%E7%A1%80%E6%9C%8D%E5%8A%A1%E9%85%8D%E7%BD%AE%E7%AE%A1%E7%90%86)  | 工程结构、YAML 配置、OmegaConf 与 dataclass 配置加载                     | `04-structure-config`              |
-| 5    | [Qdrant 与 ES 快速入门与接入](https://didilili.github.io/ai-agents-from-zero/#/%E5%AE%9E%E6%88%98%E9%A1%B9%E7%9B%AE-%E7%94%B5%E5%95%86%E9%97%AE%E6%95%B0/5-Qdrant%E4%B8%8EES%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%8E%E6%8E%A5%E5%85%A5)                                      | 向量检索、全文检索与客户端管理                                           | `05-qdrant-es`                     |
-| 6    | [MySQL、Embedding 接入与日志管理](https://didilili.github.io/ai-agents-from-zero/#/%E5%AE%9E%E6%88%98%E9%A1%B9%E7%9B%AE-%E7%94%B5%E5%95%86%E9%97%AE%E6%95%B0/6-MySQL%E3%80%81Embedding%E4%B8%8E%E6%97%A5%E5%BF%97%E7%AE%A1%E7%90%86)                                              | 异步 MySQL、TEI Embedding、loguru 日志                                   | `06-mysql-embedding-log`           |
-| 7    | [元数据知识库总览与构建入口](https://didilili.github.io/ai-agents-from-zero/#/%E5%AE%9E%E6%88%98%E9%A1%B9%E7%9B%AE-%E7%94%B5%E5%95%86%E9%97%AE%E6%95%B0/7-%E5%85%83%E6%95%B0%E6%8D%AE%E7%9F%A5%E8%AF%86%E5%BA%93%E6%80%BB%E8%A7%88%E4%B8%8E%E6%9E%84%E5%BB%BA%E5%85%A5%E5%8F%A3)  | 元数据知识库产物、存储分工和构建入口                                     | `07-metadata-base-overview`        |
-| 8    | [表与字段信息同步到元数据库](https://didilili.github.io/ai-agents-from-zero/#/%E5%AE%9E%E6%88%98%E9%A1%B9%E7%9B%AE-%E7%94%B5%E5%95%86%E9%97%AE%E6%95%B0/8-%E8%A1%A8%E4%B8%8E%E5%AD%97%E6%AE%B5%E4%BF%A1%E6%81%AF%E5%90%8C%E6%AD%A5%E5%88%B0%E5%85%83%E6%95%B0%E6%8D%AE%E5%BA%93)  | Service、Repository、Mapper、ORM 如何配合入库                            | `08-metadata-table-column-sync`    |
-| 9    | [字段与指标检索能力构建](https://didilili.github.io/ai-agents-from-zero/#/%E5%AE%9E%E6%88%98%E9%A1%B9%E7%9B%AE-%E7%94%B5%E5%95%86%E9%97%AE%E6%95%B0/9-%E5%AD%97%E6%AE%B5%E4%B8%8E%E6%8C%87%E6%A0%87%E6%A3%80%E7%B4%A2%E8%83%BD%E5%8A%9B%E6%9E%84%E5%BB%BA)                        | 字段向量索引、字段值全文索引和指标向量索引                               | `09-metadata-retrieval-capability` |
-| 10   | [问数智能体总览与工作流骨架](https://didilili.github.io/ai-agents-from-zero/#/%E5%AE%9E%E6%88%98%E9%A1%B9%E7%9B%AE-%E7%94%B5%E5%95%86%E9%97%AE%E6%95%B0/10-%E9%97%AE%E6%95%B0%E6%99%BA%E8%83%BD%E4%BD%93%E6%80%BB%E8%A7%88%E4%B8%8E%E5%B7%A5%E4%BD%9C%E6%B5%81%E9%AA%A8%E6%9E%B6) | LangGraph 工作流骨架与节点设计                                           | `10-agent-workflow-skeleton`       |
-| 11   | [关键词抽取与多路召回](https://didilili.github.io/ai-agents-from-zero/#/%E5%AE%9E%E6%88%98%E9%A1%B9%E7%9B%AE-%E7%94%B5%E5%95%86%E9%97%AE%E6%95%B0/11-%E5%85%B3%E9%94%AE%E8%AF%8D%E6%8A%BD%E5%8F%96%E4%B8%8E%E5%A4%9A%E8%B7%AF%E5%8F%AC%E5%9B%9E)                                  | 关键词抽取，字段、指标和字段取值并行召回                                 | `11-agent-keyword-multi-recall`    |
-| 12   | [召回信息合并与上下文构建](https://didilili.github.io/ai-agents-from-zero/#/%E5%AE%9E%E6%88%98%E9%A1%B9%E7%9B%AE-%E7%94%B5%E5%95%86%E9%97%AE%E6%95%B0/12-%E5%8F%AC%E5%9B%9E%E4%BF%A1%E6%81%AF%E5%90%88%E5%B9%B6%E4%B8%8E%E4%B8%8A%E4%B8%8B%E6%96%87%E6%9E%84%E5%BB%BA)            | 召回结果合并、依赖字段补齐和值域上下文构建                               | `12-agent-merge-retrievals`        |
-| 13   | [SQL 生成前的信息过滤与补全](https://didilili.github.io/ai-agents-from-zero/#/%E5%AE%9E%E6%88%98%E9%A1%B9%E7%9B%AE-%E7%94%B5%E5%95%86%E9%97%AE%E6%95%B0/13-SQL%E7%94%9F%E6%88%90%E5%89%8D%E7%9A%84%E4%BF%A1%E6%81%AF%E8%BF%87%E6%BB%A4%E4%B8%8E%E8%A1%A5%E5%85%A8)                | 候选表字段过滤、指标过滤、日期和数据库上下文补齐                         | `13-agent-filter-extra-context`    |
-| 14   | [SQL 生成与执行闭环](https://didilili.github.io/ai-agents-from-zero/#/%E5%AE%9E%E6%88%98%E9%A1%B9%E7%9B%AE-%E7%94%B5%E5%95%86%E9%97%AE%E6%95%B0/14-SQL%E7%94%9F%E6%88%90%E4%B8%8E%E6%89%A7%E8%A1%8C%E9%97%AD%E7%8E%AF)                                                            | SQL 生成、EXPLAIN 校验、错误修正和最终执行                               | `14-agent-sql-loop`                |
-| 15   | [API 接口基础与 FastAPI 入门](https://didilili.github.io/ai-agents-from-zero/#/%E5%AE%9E%E6%88%98%E9%A1%B9%E7%9B%AE-%E7%94%B5%E5%95%86%E9%97%AE%E6%95%B0/15-API%E6%8E%A5%E5%8F%A3%E5%9F%BA%E7%A1%80%E4%B8%8EFastAPI%E5%85%A5%E9%97%A8)                                            | `/api/query`、StreamingResponse 和 SSE 基础                              | `15-api-streaming-basics`          |
-| 16   | [查询接口实现与依赖组装](https://didilili.github.io/ai-agents-from-zero/#/%E5%AE%9E%E6%88%98%E9%A1%B9%E7%9B%AE-%E7%94%B5%E5%95%86%E9%97%AE%E6%95%B0/16-%E6%9F%A5%E8%AF%A2%E6%8E%A5%E5%8F%A3%E5%AE%9E%E7%8E%B0%E4%B8%8E%E4%BE%9D%E8%B5%96%E7%BB%84%E8%A3%85)                       | QueryService、依赖注入和应用生命周期资源管理                             | `16-api-query-service`             |
-| 17   | [前后端联调与日志追踪](https://didilili.github.io/ai-agents-from-zero/#/%E5%AE%9E%E6%88%98%E9%A1%B9%E7%9B%AE-%E7%94%B5%E5%95%86%E9%97%AE%E6%95%B0/17-%E5%89%8D%E5%90%8E%E7%AB%AF%E8%81%94%E8%B0%83%E4%B8%8E%E6%97%A5%E5%BF%97%E8%BF%BD%E8%B8%AA)                                  | SSE 消息协议、前端展示、异常兜底和 request_id 日志追踪                   | `17-api-integration-logging`       |
+| 配置段 | 说明 |
+| --- | --- |
+| `llm` | 模型名称、API Key 和 Base URL |
+| `auth` | JWT 密钥、签名算法和 Token 有效期 |
+| `redis` | 会话 TTL、每个会话保留的消息数 |
+| `memory` | 长期记忆开关、召回条数、相似度阈值和抽取开关 |
+| `db_meta` / `db_dw` | 元数据库和教学数仓连接 |
+| `qdrant` | 向量服务地址和维度 |
+| `es` | 全文检索地址和索引名 |
+| `embedding` | TEI 地址和模型名称 |
 
-可以用分支切换对照每一阶段的代码演进：
+关键默认值：
 
-```bash
-git checkout 04-structure-config
-git checkout main
+```yaml
+auth:
+  token_expire_minutes: 10080   # 7 天
+
+redis:
+  session_ttl_seconds: 604800   # 7 天
+  max_messages: 20              # 每个会话保留最近 20 条消息
+
+memory:
+  long_term_top_k: 5
+  long_term_score_threshold: 0.55
+  extraction_enabled: true
 ```
 
-`main` 分支保留当前完整闭环版本。
+生产环境请务必：
 
-> 本项目基于尚硅谷「大模型智能体掌柜问数」项目，并在此基础上整理完善。
+- 设置独立的 `AUTH_SECRET_KEY`
+- 修改默认体验账号密码
+- 使用 HTTPS
+- 评估将 Token 改为 HttpOnly Cookie + 刷新 Token 方案
 
-## 🚧 能力边界
+## 🔌 API 概览
 
-这套项目主要关注智能问数的学习流程，不刻意覆盖生产治理能力，例如：
+除注册和登录外，所有接口都需要：
 
-- 用户登录、角色权限和数据权限控制
-- 多租户隔离
-- SQL 安全审计和执行白名单
-- 查询缓存、限流和性能治理
-- 系统化评测集与自动化回归评测
-- 监控告警、链路追踪平台和灰度发布
-- 更复杂的多轮问数记忆、追问改写和会话管理
+```http
+Authorization: Bearer <access_token>
+```
 
-这些能力适合在基础流程跑通之后继续扩展。`shopkeeper-agent` 更适合承担一个清晰角色：先把智能问数最关键、最必要、最值得学习的工程链路讲清楚、跑起来，并为后续扩展企业级能力打基础。
+### 认证
+
+| 方法 | 路径 | 说明 |
+| --- | --- | --- |
+| `POST` | `/api/auth/register` | 注册并返回 Token |
+| `POST` | `/api/auth/login` | 登录并返回 Token |
+| `GET` | `/api/auth/me` | 获取当前用户 |
+
+### 问数
+
+```http
+POST /api/query
+```
+
+请求体：
+
+```json
+{
+  "query": "统计 2025 年 3 月各商品品类的销量和销售额",
+  "session_id": "可选，继续已有会话时传入"
+}
+```
+
+SSE 事件类型：
+
+| 事件 | 说明 |
+| --- | --- |
+| `session` | 返回本次会话 id |
+| `progress` | 节点执行进度 |
+| `result` | 查询结果表格数据 |
+| `answer` | 自然语言业务结论 |
+| `error` | 流程异常 |
+
+### 会话与记忆
+
+| 方法 | 路径 | 说明 |
+| --- | --- | --- |
+| `GET` | `/api/sessions` | 当前用户的最近会话 |
+| `POST` | `/api/sessions` | 创建空会话 |
+| `GET` | `/api/sessions/{session_id}` | 会话详情与最近消息 |
+| `DELETE` | `/api/sessions/{session_id}` | 删除会话及其长期记忆 |
+| `GET` | `/api/sessions/{session_id}/memories` | 查看该会话的长期记忆 |
+
+## 🧠 记忆与用户隔离
+
+| 记忆层 | 存储 | 内容 | 生命周期 |
+| --- | --- | --- | --- |
+| 短期会话 | Redis List | 最近 N 条消息、改写后问题、结论和 SQL | 每次追问刷新 TTL，默认 7 天 |
+| 长期记忆 | Qdrant | `episodic` 问数记录 + `semantic` 用户偏好 | 持久保存，语义检索注入提示词 |
+
+执行逻辑：
+
+1. `load_memory` 读取当前用户的历史消息和长期记忆。
+2. 在存在历史时，把当前追问改写成可独立理解的问题。
+3. 长期记忆以 `[历史问数]` / `[长期偏好]` 形式注入 SQL 生成提示词。
+4. SQL 执行后生成自然语言结论。
+5. `persist_memory` 把本轮问题、结论和 SQL 写入 Redis，并把可复用信息写入 Qdrant。
+
+隔离规则：
+
+- JWT 的 `sub` 是用户 id，后端不信任客户端传入的 `user_id`
+- 会话详情、删除和记忆查询都会校验会话归属
+- Qdrant 检索按 `user_id` 过滤
+- 其他用户无法读取或续接你的会话
+
+## ✅ 开发验证
+
+后端静态检查：
+
+```bash
+ruff check app main.py
+ruff format --check app main.py
+python -m compileall -q app main.py
+```
+
+前端检查与构建：
+
+```bash
+cd frontend
+npm run type-check
+npm run build
+```
+
+已验证的关键链路：
+
+- 未登录访问受保护接口返回 `401`
+- 注册、登录、当前用户查询
+- 用户 A/B 会话列表隔离
+- 用户 B 无法读取、续接或删除用户 A 的会话
+- 长期记忆按 `user_id` 隔离
+- SQL 执行后返回自然语言结论
+- 会话历史保存自然语言结论和 SQL
+- 前端登录、问数、结果表格和移动端布局
+
+## 🚧 后续可扩展
+
+- 角色权限与数据行级权限
+- 刷新 Token、HttpOnly Cookie 和登录限流
+- SQL 安全审计与执行白名单
+- 查询缓存、异步任务和大结果集分页
+- 系统化评测集与回归测试
+- 监控告警、链路追踪和灰度发布
+
+## 📄 License
+
+[MIT License](LICENSE)

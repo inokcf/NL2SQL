@@ -1,0 +1,4 @@
+# 开发与代码检查依赖
+-r requirements.txt
+pre-commit>=4.3.0
+ruff>=0.11.0
