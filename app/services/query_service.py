@@ -76,7 +76,7 @@ class QueryService:
     async def query(
         self,
         query: str,
-        user_id: str = "default",
+        user_id: str,
         session_id: str | None = None,
     ):
         """执行一次问数工作流，并逐段产出 SSE 消息"""

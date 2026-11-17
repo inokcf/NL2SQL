@@ -133,7 +133,11 @@ async function copyMessage() {
 
 .message-body {
   min-width: 0;
-  max-width: min(860px, 100%);
+  max-width: min(880px, 100%);
+}
+
+.message--assistant .message-body {
+  flex: 1;
 }
 
 .message--user .message-body {
@@ -338,6 +342,10 @@ async function copyMessage() {
 }
 
 @media (max-width: 640px) {
+  .message--assistant .message-body {
+    flex: 1;
+  }
+
   .message--user .message-body {
     max-width: 88%;
   }

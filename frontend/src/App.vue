@@ -1,20 +1,29 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref, watch } from "vue";
-import { X } from "lucide-vue-next";
+import {
+  computed,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  watch,
+} from "vue";
+import { LoaderCircle, Sparkles, X } from "lucide-vue-next";
 
 import AppSidebar from "./components/AppSidebar.vue";
+import AuthView from "./components/AuthView.vue";
 import ChatHeader from "./components/ChatHeader.vue";
 import ComposerBar from "./components/ComposerBar.vue";
 import ConfirmDialog from "./components/ConfirmDialog.vue";
 import EmptyState from "./components/EmptyState.vue";
 import MemoryDrawer from "./components/MemoryDrawer.vue";
 import MessageItem from "./components/MessageItem.vue";
+import { useAuth } from "./composables/useAuth";
 import { useChat } from "./composables/useChat";
+import { AUTH_EXPIRED_EVENT } from "./lib/apiBase";
 import { examplePrompts } from "./lib/examples";
 import type { SessionInfo } from "./types/agent";
 
 const {
-  userId,
   messages,
   draft,
   sessionId,
@@ -30,6 +39,7 @@ const {
   startQuery,
   stopQuery,
   newChat,
+  resetAll,
   selectSession,
   deleteSessionById,
   refreshSessions,
@@ -37,6 +47,15 @@ const {
   pushNotice,
   clearNotice,
 } = useChat();
+
+const {
+  user,
+  isAuthenticated,
+  initialized,
+  initialize,
+  logout,
+  expire,
+} = useAuth();
 
 const sidebarOpen = ref(false);
 const memoryOpen = ref(false);
@@ -74,6 +93,13 @@ async function scrollToBottom() {
   await nextTick();
   const element = scrollEl.value;
   if (!element) return;
+
+  // 空状态通常比移动端视口更高，此时应回到顶部展示标题而不是滚到底部
+  if (messages.value.length === 0) {
+    element.scrollTo({ top: 0, behavior: "auto" });
+    return;
+  }
+
   element.scrollTo({
     top: element.scrollHeight,
     behavior: isStreaming.value ? "auto" : "smooth",
@@ -82,9 +108,39 @@ async function scrollToBottom() {
 
 watch(messages, scrollToBottom, { deep: true });
 
-onMounted(() => {
-  refreshSessions(true);
+watch(isAuthenticated, async (authenticated, previous) => {
+  if (!authenticated) {
+    resetAll();
+    sidebarOpen.value = false;
+    memoryOpen.value = false;
+    confirmTarget.value = null;
+    return;
+  }
+
+  if (!previous) {
+    resetAll();
+    sidebarOpen.value = false;
+    memoryOpen.value = false;
+    await refreshSessions(true);
+  }
 });
+
+function handleAuthExpired() {
+  expire();
+}
+
+onMounted(async () => {
+  window.addEventListener(AUTH_EXPIRED_EVENT, handleAuthExpired);
+  await initialize();
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener(AUTH_EXPIRED_EVENT, handleAuthExpired);
+});
+
+function handleLogout() {
+  logout();
+}
 
 function handleNewChat() {
   if (isStreaming.value) return;
@@ -133,7 +189,25 @@ function handleRefreshSessions() {
 </script>
 
 <template>
-  <div class="app-shell">
+  <div v-if="!initialized" class="boot-screen">
+    <div class="boot-brand">
+      <span class="boot-logo" aria-hidden="true">
+        <Sparkles :size="20" />
+      </span>
+      <div class="boot-copy">
+        <strong>AI问数</strong>
+        <span>NL2SQL Agent</span>
+      </div>
+    </div>
+    <span class="boot-loading">
+      <LoaderCircle class="spin" :size="14" />
+      正在恢复登录状态…
+    </span>
+  </div>
+
+  <AuthView v-else-if="!isAuthenticated" />
+
+  <div v-else class="app-shell">
     <div class="ambient ambient--mint" aria-hidden="true" />
     <div class="ambient ambient--sky" aria-hidden="true" />
 
@@ -152,7 +226,7 @@ function handleRefreshSessions() {
       :sessions-loading="sessionsLoading"
       :sessions-error="sessionsError"
       :service-state="serviceState"
-      :user-id="userId"
+      :user="user"
       :examples="examplePrompts"
       @new-chat="handleNewChat"
       @select-session="handleSelectSession"
@@ -160,6 +234,7 @@ function handleRefreshSessions() {
       @use-example="handleUseExample"
       @refresh="handleRefreshSessions"
       @close="sidebarOpen = false"
+      @logout="handleLogout"
     />
 
     <main class="main-panel">
@@ -254,6 +329,61 @@ function handleRefreshSessions() {
 </template>
 
 <style scoped>
+.boot-screen {
+  display: flex;
+  height: 100dvh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(16, 156, 137, 0.12), transparent 34%),
+    radial-gradient(circle at 78% 12%, rgba(77, 141, 247, 0.1), transparent 28%),
+    var(--bg);
+}
+
+.boot-brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.boot-logo {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 13px;
+  background: linear-gradient(135deg, #18b7a2, #0b897a);
+  box-shadow: 0 8px 18px rgba(16, 156, 137, 0.24);
+  color: #fff;
+}
+
+.boot-copy {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}
+
+.boot-copy strong {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.boot-copy span {
+  color: var(--text-muted);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+}
+
+.boot-loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
 .app-shell {
   position: relative;
   display: grid;

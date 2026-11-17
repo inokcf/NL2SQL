@@ -2,13 +2,17 @@
  * 问数 SSE 接口客户端
  * 解析后端以 data: 开头的 SSE 消息，并持续回调 session / progress / result / error 事件。
  */
-import { apiUrl } from "./apiBase";
+import {
+  apiUrl,
+  authHeaders,
+  handleUnauthorized,
+  readErrorMessage,
+} from "./apiBase";
 import type { AgentEvent } from "../types/agent";
 
 type QueryOptions = {
   signal?: AbortSignal;
   sessionId?: string;
-  userId?: string;
   onEvent: (event: AgentEvent) => void;
 };
 
@@ -18,17 +22,18 @@ export async function streamQuery(query: string, options: QueryOptions) {
     headers: {
       "Content-Type": "application/json",
       Accept: "text/event-stream",
+      ...authHeaders(),
     },
     body: JSON.stringify({
       query,
       session_id: options.sessionId,
-      user_id: options.userId,
     }),
     signal: options.signal,
   });
 
   if (!response.ok) {
-    throw new Error(`接口请求失败：HTTP ${response.status}`);
+    handleUnauthorized(response.status);
+    throw new Error(await readErrorMessage(response));
   }
 
   if (!response.body) {

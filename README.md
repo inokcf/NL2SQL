@@ -99,8 +99,8 @@ redis:
   host: localhost
   port: 6380
   password: dili123
-  session_ttl_seconds: 1800  # 短期会话 TTL
-  max_messages: 20           # 每个会话保留的最近消息数
+  session_ttl_seconds: 604800  # 短期会话 TTL，默认 7 天
+  max_messages: 20             # 每个会话保留的最近消息数
 
 memory:
   long_term_enabled: true
@@ -109,15 +109,43 @@ memory:
   extraction_enabled: true
 ```
 
-会话管理接口：
+会话管理接口（均需登录 Token）：
 
 - `POST /api/sessions` 创建会话
-- `GET /api/sessions?user_id=default` 会话列表
+- `GET /api/sessions` 当前用户的会话列表
 - `GET /api/sessions/{session_id}` 会话详情（最近消息）
 - `GET /api/sessions/{session_id}/memories` 查看该会话写入的长期记忆
 - `DELETE /api/sessions/{session_id}` 删除会话及其长期记忆
 
-`POST /api/query` 新增 `session_id` 和 `user_id` 字段；不传 `session_id` 时后端自动创建，并通过 SSE 的 `session` 事件返回。
+`POST /api/query` 支持 `session_id`；不传时后端自动创建，并通过 SSE 的 `session` 事件返回。
+用户身份从登录 Token 中获取，前端不再传递 `user_id`。
+
+## 🔐 用户登录与数据隔离
+
+- 用户信息保存在 Meta MySQL 的 `user_info` 表
+- 密码使用标准库 `hashlib.scrypt` 加盐哈希，不保存明文
+- 登录成功后签发 HS256 JWT，前端通过 `Authorization: Bearer <token>` 访问受保护接口
+- Redis 短期会话和 Qdrant 长期记忆都以登录用户 id 作为隔离键
+- 会话详情、删除和记忆查询都会校验会话归属，不能访问其他用户的会话
+- 首次启动会自动创建体验账号：`admin` / `admin123`
+
+认证接口：
+
+- `POST /api/auth/register` 注册并返回 Token
+- `POST /api/auth/login` 登录并返回 Token
+- `GET /api/auth/me` 获取当前登录用户
+
+认证配置：
+
+```yaml
+auth:
+  secret_key: ${oc.env:AUTH_SECRET_KEY,dev-only-secret-change-me-please-32-bytes}
+  algorithm: HS256
+  token_expire_minutes: 10080  # 默认 7 天
+```
+
+生产环境请通过 `AUTH_SECRET_KEY` 环境变量设置足够长的随机密钥，并替换默认体验账号密码。
+前端为方便本地演示将 Token 保存在 `localStorage`，正式项目可改为 HttpOnly Cookie + 刷新 Token 方案。
 
 ## 🛠️ 项目技术栈
 
@@ -132,6 +160,7 @@ memory:
 | 智能体编排 | `LangGraph`                       | 组织多阶段问数工作流                           |
 | 模型接入   | `LangChain`                       | 封装 LLM 与 Embedding 调用                     |
 | 后端接口   | `FastAPI`                         | 提供问数 API、依赖注入和生命周期管理           |
+| 登录认证   | `PyJWT` / `scrypt`                | JWT 登录、密码哈希与接口鉴权                   |
 | 流式协议   | `SSE`                             | 实时返回节点进度、查询结果和错误消息           |
 | 前端       | `Vue 3` / `Vite` / `TypeScript`   | 提供聊天式问数界面、会话管理和记忆查看         |
 | 日志追踪   | `ContextVar` / `loguru`           | 为并发请求注入 request_id，便于排查链路        |
@@ -146,7 +175,7 @@ shopkeeper-agent/
 │   ├── api/              # FastAPI 路由、依赖注入、生命周期和请求结构
 │   ├── clients/          # MySQL、Qdrant、Elasticsearch、Redis、Embedding 客户端管理
 │   ├── conf/             # 配置 dataclass 与配置加载工具
-│   ├── core/             # 日志、request_id 上下文等通用能力
+│   ├── core/             # 日志、request_id、JWT 与密码安全等通用能力
 │   ├── entities/         # 更贴近业务语义的数据对象
 │   ├── models/           # SQLAlchemy ORM 模型
 │   ├── prompt/           # Prompt 加载工具

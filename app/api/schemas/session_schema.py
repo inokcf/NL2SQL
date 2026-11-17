@@ -10,7 +10,6 @@ from pydantic import BaseModel, Field
 class SessionCreateSchema(BaseModel):
     """创建会话请求体"""
 
-    user_id: str = "default"
     title: str = "新会话"
 
 

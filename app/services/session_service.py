@@ -26,9 +26,7 @@ class SessionService:
         self.session_repository = session_repository
         self.memory_repository = memory_repository
 
-    async def create_session(
-        self, user_id: str = "default", title: str = "新会话"
-    ) -> SessionInfo:
+    async def create_session(self, user_id: str, title: str = "新会话") -> SessionInfo:
         """显式创建一个空会话"""
         return await self.session_repository.create_session(
             user_id=user_id, title=title
@@ -40,11 +38,15 @@ class SessionService:
         session_id: str | None = None,
         title: str = "新会话",
     ) -> SessionInfo:
-        """存在则复用，不存在或已过期则按原 id 重建"""
+        """存在且属于当前用户则复用，否则创建一个新会话"""
         if session_id:
             session = await self.session_repository.get_session(session_id)
             if session is not None:
-                return session
+                if session.user_id == user_id:
+                    return session
+                # 不允许复用其他用户的 session_id，直接降级为全新会话
+                logger.warning(f"会话 {session_id} 不属于用户 {user_id}，将创建新会话")
+                session_id = None
 
         return await self.session_repository.create_session(
             user_id=user_id,
@@ -52,17 +54,30 @@ class SessionService:
             session_id=session_id,
         )
 
-    async def list_sessions(
-        self, user_id: str = "default", limit: int = 50
-    ) -> list[SessionInfo]:
+    async def list_sessions(self, user_id: str, limit: int = 50) -> list[SessionInfo]:
         """返回用户最近的会话列表"""
         return await self.session_repository.list_sessions(user_id=user_id, limit=limit)
 
+    async def get_session_for_user(
+        self, session_id: str, user_id: str
+    ) -> SessionInfo | None:
+        """读取会话元信息，并校验会话归属"""
+        try:
+            session = await self.session_repository.get_session(session_id)
+        except Exception as e:
+            # Redis 不可用时无法确认会话归属，按不存在处理，避免越权访问
+            logger.warning(f"读取会话归属失败：{e}")
+            return None
+
+        if session is None or session.user_id != user_id:
+            return None
+        return session
+
     async def get_session_detail(
-        self, session_id: str
+        self, session_id: str, user_id: str
     ) -> tuple[SessionInfo, list[ChatMessage]] | None:
-        """读取会话元信息和短期消息窗口"""
-        session = await self.session_repository.get_session(session_id)
+        """读取属于当前用户的会话元信息和短期消息窗口"""
+        session = await self.get_session_for_user(session_id, user_id)
         if session is None:
             return None
 
@@ -70,9 +85,13 @@ class SessionService:
         return session, messages
 
     async def list_memories(
-        self, session_id: str, limit: int = 100
-    ) -> list[ConversationMemory]:
-        """读取某个会话写入的长期记忆"""
+        self, session_id: str, user_id: str, limit: int = 100
+    ) -> list[ConversationMemory] | None:
+        """读取某个会话写入的长期记忆，并校验会话归属"""
+        session = await self.get_session_for_user(session_id, user_id)
+        if session is None:
+            return None
+
         try:
             return await self.memory_repository.scroll_by_session(
                 session_id=session_id, limit=limit
@@ -81,9 +100,9 @@ class SessionService:
             logger.warning(f"读取会话长期记忆失败：{e}")
             return []
 
-    async def delete_session(self, session_id: str) -> bool:
-        """删除会话及其产生的长期记忆"""
-        session = await self.session_repository.get_session(session_id)
+    async def delete_session(self, session_id: str, user_id: str) -> bool:
+        """删除属于当前用户的会话及其长期记忆"""
+        session = await self.get_session_for_user(session_id, user_id)
         if session is None:
             return False
 

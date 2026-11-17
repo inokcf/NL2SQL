@@ -43,6 +43,13 @@ llm:
   api_key: ${oc.env:LLM_API_KEY}
   base_url: https://api.deepseek.com
 
+auth:
+  # 生产环境务必通过 AUTH_SECRET_KEY 环境变量覆盖
+  secret_key: ${oc.env:AUTH_SECRET_KEY,dev-only-secret-change-me-please-32-bytes}
+  algorithm: HS256
+  # 登录 Token 有效期，默认 7 天
+  token_expire_minutes: 10080
+
 redis:
   host: localhost
   port: 6380

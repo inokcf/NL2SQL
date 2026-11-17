@@ -5,6 +5,7 @@ import {
   Brain,
   History,
   LoaderCircle,
+  LogOut,
   MessageSquare,
   Plus,
   RefreshCw,
@@ -16,6 +17,7 @@ import {
 import { relativeTime } from "../lib/format";
 import type { ExamplePrompt } from "../lib/examples";
 import type { ServiceState, SessionInfo } from "../types/agent";
+import type { AuthUser } from "../types/auth";
 
 const props = defineProps<{
   sessions: SessionInfo[];
@@ -24,7 +26,7 @@ const props = defineProps<{
   sessionsLoading: boolean;
   sessionsError: boolean;
   serviceState: ServiceState;
-  userId: string;
+  user: AuthUser | null;
   examples: ExamplePrompt[];
 }>();
 
@@ -35,6 +37,7 @@ const emit = defineEmits<{
   (event: "use-example", text: string): void;
   (event: "refresh"): void;
   (event: "close"): void;
+  (event: "logout"): void;
 }>();
 
 const statusText = computed(() => {
@@ -44,6 +47,23 @@ const statusText = computed(() => {
 });
 
 const statusClass = computed(() => `is-${props.serviceState}`);
+
+const displayName = computed(
+  () => props.user?.display_name || props.user?.username || "未登录",
+);
+
+const userMeta = computed(() => {
+  if (!props.user) return "未登录";
+  const role = props.user.role === "admin" ? "管理员" : "普通用户";
+  return `@${props.user.username} · ${role}`;
+});
+
+const userInitial = computed(() =>
+  (props.user?.display_name || props.user?.username || "U")
+    .trim()
+    .charAt(0)
+    .toUpperCase(),
+);
 </script>
 
 <template>
@@ -197,10 +217,28 @@ const statusClass = computed(() => `is-${props.serviceState}`);
         <span class="service-dot" :class="statusClass" aria-hidden="true" />
         <div class="service-copy">
           <strong>{{ statusText }}</strong>
-          <span>{{ userId === "default" ? "默认用户" : userId }}</span>
+          <span>会话与记忆服务</span>
         </div>
         <Brain :size="16" class="service-icon" aria-hidden="true" />
       </div>
+
+      <div class="user-card">
+        <span class="user-avatar" aria-hidden="true">{{ userInitial }}</span>
+        <div class="user-copy">
+          <strong>{{ displayName }}</strong>
+          <span>{{ userMeta }}</span>
+        </div>
+        <button
+          type="button"
+          class="icon-button logout-button"
+          title="退出登录"
+          aria-label="退出登录"
+          @click="emit('logout')"
+        >
+          <LogOut :size="15" />
+        </button>
+      </div>
+
       <p class="foot-note">Redis 短期会话 · Qdrant 长期记忆</p>
     </div>
   </aside>
@@ -627,6 +665,66 @@ const statusClass = computed(() => `is-${props.serviceState}`);
 
 .service-icon {
   color: var(--text-muted);
+}
+
+.user-card {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 8px;
+  padding: 9px 10px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.user-avatar {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #18b7a2, #4d8df7);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.user-copy {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  line-height: 1.35;
+}
+
+.user-copy strong {
+  overflow: hidden;
+  font-size: 11.5px;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-copy span {
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.logout-button {
+  width: 28px;
+  height: 28px;
+  color: var(--text-muted);
+}
+
+.logout-button:hover {
+  border-color: rgba(217, 82, 82, 0.16);
+  background: var(--danger-soft);
+  color: var(--danger);
 }
 
 .foot-note {

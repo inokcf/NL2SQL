@@ -24,8 +24,6 @@ import type {
   SessionMessage,
 } from "../types/agent";
 
-const USER_ID = "default";
-
 function makeId() {
   return (
     crypto.randomUUID?.() ??
@@ -89,6 +87,8 @@ export function useChat() {
 
   let controller: AbortController | null = null;
   let noticeTimer: ReturnType<typeof setTimeout> | undefined;
+  // 用户切换或退出登录时递增，用于让旧的流式请求在 finally 中提前退出
+  let runToken = 0;
 
   const activeSession = computed(
     () =>
@@ -113,7 +113,7 @@ export function useChat() {
     sessionsLoading.value = true;
     sessionsError.value = false;
     try {
-      sessions.value = await listSessions(USER_ID, 30);
+      sessions.value = await listSessions(30);
       if (!isStreaming.value) serviceState.value = "ready";
     } catch (error) {
       sessionsError.value = true;
@@ -155,6 +155,7 @@ export function useChat() {
     messages.value.push(userMessage, assistantMessage);
 
     controller = new AbortController();
+    const run = ++runToken;
     isStreaming.value = true;
     serviceState.value = "busy";
 
@@ -164,6 +165,8 @@ export function useChat() {
     const onEvent = (event: AgentEvent) => {
       if (event.type === "session") {
         sessionId.value = event.session_id;
+        // 会话在流式开始前已经写入 Redis，先刷新一次让侧边栏立即出现本轮会话
+        void refreshSessions(true);
         return;
       }
 
@@ -200,7 +203,6 @@ export function useChat() {
       await streamQuery(query, {
         signal: controller.signal,
         sessionId: sessionId.value ?? undefined,
-        userId: USER_ID,
         onEvent,
       });
 
@@ -234,6 +236,8 @@ export function useChat() {
         pushNotice("error", "请求失败，请确认后端服务已启动。");
       }
     } finally {
+      // 退出登录或切换用户后，旧请求不再更新全局状态
+      if (run !== runToken) return;
       isStreaming.value = false;
       controller = null;
       if (serviceState.value !== "error") serviceState.value = "ready";
@@ -251,6 +255,23 @@ export function useChat() {
     draft.value = "";
     sessionId.value = null;
     memories.value = [];
+  }
+
+  function resetAll() {
+    runToken += 1;
+    controller?.abort();
+    controller = null;
+    isStreaming.value = false;
+    memoryLoading.value = false;
+    sessionsLoading.value = false;
+    sessionsError.value = false;
+    messages.value = [];
+    draft.value = "";
+    sessionId.value = null;
+    sessions.value = [];
+    memories.value = [];
+    serviceState.value = "ready";
+    clearNotice();
   }
 
   async function selectSession(targetSessionId: string) {
@@ -317,7 +338,6 @@ export function useChat() {
   });
 
   return {
-    userId: USER_ID,
     messages,
     draft,
     sessionId,
@@ -333,6 +353,7 @@ export function useChat() {
     startQuery,
     stopQuery,
     newChat,
+    resetAll,
     selectSession,
     deleteSessionById,
     refreshSessions,
