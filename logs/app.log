@@ -119,3 +119,27 @@ b''
 2026-11-17 18:18:12.770 | WARNING  | request_id - 1 | app.api.lifespan:lifespan:51 - 长期记忆集合初始化失败，首次使用时将重试：Unexpected Response: 502 (Bad Gateway)
 Raw response content:
 b''
+2026-11-17 18:20:44.346 | WARNING  | request_id - 1 | app.api.lifespan:lifespan:43 - Redis 暂不可用，会话记忆将降级：Timeout connecting to server
+2026-11-17 18:20:44.479 | WARNING  | request_id - 1 | app.api.lifespan:lifespan:51 - 长期记忆集合初始化失败，首次使用时将重试：Unexpected Response: 502 (Bad Gateway)
+Raw response content:
+b''
+2026-11-17 18:20:44.346 | WARNING  | request_id - 1 | app.api.lifespan:lifespan:43 - Redis 暂不可用，会话记忆将降级：Timeout connecting to server
+2026-11-17 18:20:44.479 | WARNING  | request_id - 1 | app.api.lifespan:lifespan:51 - 长期记忆集合初始化失败，首次使用时将重试：Unexpected Response: 502 (Bad Gateway)
+Raw response content:
+b''
+2026-11-17 18:22:36.714 | WARNING  | request_id - 1 | app.api.lifespan:lifespan:43 - Redis 暂不可用，会话记忆将降级：Timeout connecting to server
+2026-11-17 18:22:36.878 | WARNING  | request_id - 1 | app.api.lifespan:lifespan:51 - 长期记忆集合初始化失败，首次使用时将重试：Unexpected Response: 502 (Bad Gateway)
+Raw response content:
+b''
+2026-11-17 18:20:44.346 | WARNING  | request_id - 1 | app.api.lifespan:lifespan:43 - Redis 暂不可用，会话记忆将降级：Timeout connecting to server
+2026-11-17 18:20:44.479 | WARNING  | request_id - 1 | app.api.lifespan:lifespan:51 - 长期记忆集合初始化失败，首次使用时将重试：Unexpected Response: 502 (Bad Gateway)
+Raw response content:
+b''
+2026-11-17 18:20:44.346 | WARNING  | request_id - 1 | app.api.lifespan:lifespan:43 - Redis 暂不可用，会话记忆将降级：Timeout connecting to server
+2026-11-17 18:20:44.479 | WARNING  | request_id - 1 | app.api.lifespan:lifespan:51 - 长期记忆集合初始化失败，首次使用时将重试：Unexpected Response: 502 (Bad Gateway)
+Raw response content:
+b''
+2026-11-17 18:22:36.714 | WARNING  | request_id - 1 | app.api.lifespan:lifespan:43 - Redis 暂不可用，会话记忆将降级：Timeout connecting to server
+2026-11-17 18:22:36.878 | WARNING  | request_id - 1 | app.api.lifespan:lifespan:51 - 长期记忆集合初始化失败，首次使用时将重试：Unexpected Response: 502 (Bad Gateway)
+Raw response content:
+b''
