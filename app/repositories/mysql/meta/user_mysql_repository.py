@@ -24,6 +24,10 @@ class UserMySQLRepository:
 
     async def ensure_table(self):
         """为已有数据库补建用户表，避免必须重建 MySQL 容器"""
+        exists = await self.session.execute(text("SHOW TABLES LIKE 'user_info'"))
+        if exists.first():
+            return
+
         sql = """
         CREATE TABLE IF NOT EXISTS user_info (
             id VARCHAR(36) PRIMARY KEY COMMENT '用户编号',

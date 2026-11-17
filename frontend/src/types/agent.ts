@@ -27,7 +27,17 @@ export type SessionEvent = {
   user_id: string;
 };
 
-export type AgentEvent = ProgressEvent | ResultEvent | ErrorEvent | SessionEvent;
+export type AnswerEvent = {
+  type: "answer";
+  content: string;
+};
+
+export type AgentEvent =
+  | ProgressEvent
+  | ResultEvent
+  | ErrorEvent
+  | SessionEvent
+  | AnswerEvent;
 
 export type StepState = {
   step: string;

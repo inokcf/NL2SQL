@@ -179,6 +179,7 @@ class ConversationMemoryService:
         resolved_query: str,
         sql: str,
         sql_result: list[dict] | None,
+        answer: str = "",
         history: list[dict] | None = None,
     ) -> None:
         """保存一轮问答到 Redis 短期记忆，并把可复用信息写入 Qdrant 长期记忆"""
@@ -189,9 +190,12 @@ class ConversationMemoryService:
         created_at = self._now_iso()
         row_count = len(sql_result) if isinstance(sql_result, list) else 0
 
-        assistant_content = f"已生成并执行 SQL，返回 {row_count} 行。"
+        # 优先保存自然语言结论，历史上也能直接看到本轮回答而不是只有 SQL
+        assistant_content = (answer or "").strip() or (
+            f"已生成并执行 SQL，返回 {row_count} 行。"
+        )
         if sql:
-            assistant_content += f"\nSQL：{self._truncate(sql, 1500)}"
+            assistant_content += f"\n\nSQL：{self._truncate(sql, 1500)}"
 
         user_message = ChatMessage(
             id=str(uuid.uuid4()),
@@ -230,6 +234,7 @@ class ConversationMemoryService:
                 query=query,
                 resolved_query=resolved_query,
                 sql=sql,
+                answer=answer,
                 history=history or [],
                 created_at=created_at,
             )
@@ -244,6 +249,7 @@ class ConversationMemoryService:
         query: str,
         resolved_query: str,
         sql: str,
+        answer: str,
         history: list[dict],
         created_at: str,
     ) -> None:
@@ -252,6 +258,7 @@ class ConversationMemoryService:
             "历史问数记录\n"
             f"用户问题：{query}\n"
             f"独立问题：{resolved_query}\n"
+            f"分析结论：{answer}\n"
             f"生成 SQL：{sql}",
             self.config.max_memory_chars * 4,
         )
@@ -263,6 +270,7 @@ class ConversationMemoryService:
                 query=query,
                 resolved_query=resolved_query,
                 sql=sql,
+                answer=answer,
                 history=history,
             ),
         )
@@ -310,6 +318,7 @@ class ConversationMemoryService:
         query: str,
         resolved_query: str,
         sql: str,
+        answer: str,
         history: list[dict],
     ) -> dict:
         """调用 LLM 从本轮问数中抽取稳定偏好和业务口径"""
@@ -318,7 +327,13 @@ class ConversationMemoryService:
 
         prompt = PromptTemplate(
             template=load_prompt("extract_memory"),
-            input_variables=["history", "query", "resolved_query", "sql"],
+            input_variables=[
+                "history",
+                "query",
+                "resolved_query",
+                "sql",
+                "answer",
+            ],
         )
         chain = prompt | self.llm | JsonOutputParser()
         try:
@@ -328,6 +343,7 @@ class ConversationMemoryService:
                     "query": query,
                     "resolved_query": resolved_query,
                     "sql": self._truncate(sql, 2000),
+                    "answer": self._truncate(answer, 800),
                 }
             )
         except Exception as e:

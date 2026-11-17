@@ -191,6 +191,13 @@ export function useChat() {
         return;
       }
 
+      if (event.type === "answer") {
+        // 查询结果先到达，随后用自然语言结论替换临时摘要
+        message.content = event.content;
+        if (message.status === "streaming") message.status = "done";
+        return;
+      }
+
       if (event.type === "error") {
         settleRunningSteps(message);
         message.status = "error";

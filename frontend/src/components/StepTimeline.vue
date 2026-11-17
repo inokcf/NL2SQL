@@ -52,6 +52,7 @@ const phaseMap: Record<string, string> = {
   校验SQL: "生成并执行",
   校正SQL: "生成并执行",
   执行SQL: "生成并执行",
+  生成分析结论: "生成并执行",
 };
 
 const phases = computed(() => {

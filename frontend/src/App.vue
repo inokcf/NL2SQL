@@ -69,6 +69,18 @@ const canSend = computed(
 
 const showEmpty = computed(() => messages.value.length === 0);
 
+const lastAssistantMessage = computed(() =>
+  [...messages.value].reverse().find((message) => message.role === "assistant"),
+);
+
+const streamingLabel = computed(() => {
+  if (!isStreaming.value) return "本次分析结束";
+  const answered = lastAssistantMessage.value?.steps?.some(
+    (step) => step.step === "生成分析结论" && step.status === "success",
+  );
+  return answered ? "正在保存会话记忆…" : "正在分析中";
+});
+
 const headerTitle = computed(() => {
   if (activeSession.value?.title) return activeSession.value.title;
   const firstQuestion = messages.value.find(
@@ -265,7 +277,7 @@ function handleRefreshSessions() {
 
           <div class="conversation-end">
             <span aria-hidden="true" />
-            {{ isStreaming ? "正在分析中" : "本次分析结束" }}
+            {{ streamingLabel }}
             <span aria-hidden="true" />
           </div>
         </div>

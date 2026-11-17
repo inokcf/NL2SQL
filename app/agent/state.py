@@ -109,5 +109,6 @@ class DataAgentState(TypedDict):
 
     sql: str  # 生成或校正后的SQL
     sql_result: list[dict]  # SQL 执行结果
+    answer: str  # 根据 SQL 结果生成的业务自然语言结论
 
     error: str  # 校验SQL时出现的错误信息
