@@ -107,39 +107,7 @@ JOIN dim_product dp ON fo.product_id = dp.product_id
 WHERE fo.date_id >= 20250301 AND fo.date_id < 20250401
 GROUP BY dp.category
 ORDER BY 销售额 DESC;
-2026-11-17 17:22:16.041 | INFO     | request_id - 869cce49-3e3c-4ea1-84e2-a9e23c5ef543 | app.agent.nodes.validate_sql:validate_sql:34 - SQL语法正确
-2026-11-17 17:22:16.058 | INFO     | request_id - 869cce49-3e3c-4ea1-84e2-a9e23c5ef543 | app.agent.nodes.run_sql:run_sql:29 - SQL执行结果：[{'商品品类': '手机数码', '销量': Decimal('10'), '销售额': 62190.0}, {'商品品类': '家用电器', '销量': Decimal('6'), '销售额': 19196.0}, {'商品品类': '鞋靴', '销量': Decimal('4'), '销售额': 4396.0}, {'商品品类': '服饰', '销量': Decimal('7'), '销售额': 2593.0}, {'商品品类': '食品饮料', '销量': Decimal('139'), '销售额': 1115.0}, {'商品品类': '休闲零食', '销量': Decimal('156'), '销售额': 630.0}]
-2026-11-17 17:22:18.485 | INFO     | request_id - 869cce49-3e3c-4ea1-84e2-a9e23c5ef543 | app.agent.nodes.generate_answer:generate_answer:102 - 分析结论：2025年3月各品类中，手机数码销售额最高，为62190元；家用电器次之，为19196元，二者明显领先其他品类。销量方面，休闲零食和食品饮料分别以156、139居前，但销售额仅630元和1115元，呈现低客单价特征。手机数码销量10，却贡献最高销售额。
-2026-11-17 17:22:23.916 | INFO     | request_id - 869cce49-3e3c-4ea1-84e2-a9e23c5ef543 | app.services.conversation_memory_service:_save_long_term:314 - 写入长期记忆：episodic=1, semantic=3
-2026-11-17 18:18:12.629 | WARNING  | request_id - 1 | app.api.lifespan:lifespan:43 - Redis 暂不可用，会话记忆将降级：Timeout connecting to server
-2026-11-17 18:18:12.770 | WARNING  | request_id - 1 | app.api.lifespan:lifespan:51 - 长期记忆集合初始化失败，首次使用时将重试：Unexpected Response: 502 (Bad Gateway)
-Raw response content:
-b''
-2026-11-17 18:18:12.629 | WARNING  | request_id - 1 | app.api.lifespan:lifespan:43 - Redis 暂不可用，会话记忆将降级：Timeout connecting to server
-2026-11-17 18:18:12.770 | WARNING  | request_id - 1 | app.api.lifespan:lifespan:51 - 长期记忆集合初始化失败，首次使用时将重试：Unexpected Response: 502 (Bad Gateway)
-Raw response content:
-b''
-2026-11-17 18:20:44.346 | WARNING  | request_id - 1 | app.api.lifespan:lifespan:43 - Redis 暂不可用，会话记忆将降级：Timeout connecting to server
-2026-11-17 18:20:44.479 | WARNING  | request_id - 1 | app.api.lifespan:lifespan:51 - 长期记忆集合初始化失败，首次使用时将重试：Unexpected Response: 502 (Bad Gateway)
-Raw response content:
-b''
-2026-11-17 18:20:44.346 | WARNING  | request_id - 1 | app.api.lifespan:lifespan:43 - Redis 暂不可用，会话记忆将降级：Timeout connecting to server
-2026-11-17 18:20:44.479 | WARNING  | request_id - 1 | app.api.lifespan:lifespan:51 - 长期记忆集合初始化失败，首次使用时将重试：Unexpected Response: 502 (Bad Gateway)
-Raw response content:
-b''
-2026-11-17 18:22:36.714 | WARNING  | request_id - 1 | app.api.lifespan:lifespan:43 - Redis 暂不可用，会话记忆将降级：Timeout connecting to server
-2026-11-17 18:22:36.878 | WARNING  | request_id - 1 | app.api.lifespan:lifespan:51 - 长期记忆集合初始化失败，首次使用时将重试：Unexpected Response: 502 (Bad Gateway)
-Raw response content:
-b''
-2026-11-17 18:20:44.346 | WARNING  | request_id - 1 | app.api.lifespan:lifespan:43 - Redis 暂不可用，会话记忆将降级：Timeout connecting to server
-2026-11-17 18:20:44.479 | WARNING  | request_id - 1 | app.api.lifespan:lifespan:51 - 长期记忆集合初始化失败，首次使用时将重试：Unexpected Response: 502 (Bad Gateway)
-Raw response content:
-b''
-2026-11-17 18:20:44.346 | WARNING  | request_id - 1 | app.api.lifespan:lifespan:43 - Redis 暂不可用，会话记忆将降级：Timeout connecting to server
-2026-11-17 18:20:44.479 | WARNING  | request_id - 1 | app.api.lifespan:lifespan:51 - 长期记忆集合初始化失败，首次使用时将重试：Unexpected Response: 502 (Bad Gateway)
-Raw response content:
-b''
-2026-11-17 18:22:36.714 | WARNING  | request_id - 1 | app.api.lifespan:lifespan:43 - Redis 暂不可用，会话记忆将降级：Timeout connecting to server
-2026-11-17 18:22:36.878 | WARNING  | request_id - 1 | app.api.lifespan:lifespan:51 - 长期记忆集合初始化失败，首次使用时将重试：Unexpected Response: 502 (Bad Gateway)
+2026-11-17 18:31:22.462 | WARNING  | request_id - 1 | app.api.lifespan:lifespan:43 - Redis 暂不可用，会话记忆将降级：Timeout connecting to server
+2026-11-17 18:31:22.593 | WARNING  | request_id - 1 | app.api.lifespan:lifespan:51 - 长期记忆集合初始化失败，首次使用时将重试：Unexpected Response: 502 (Bad Gateway)
 Raw response content:
 b''
