@@ -22,6 +22,8 @@ const {
   memories,
   isStreaming,
   memoryLoading,
+  sessionsLoading,
+  sessionsError,
   serviceState,
   notice,
   activeSession,
@@ -147,6 +149,8 @@ function handleRefreshSessions() {
       :sessions="sessions"
       :active-session-id="sessionId"
       :is-streaming="isStreaming"
+      :sessions-loading="sessionsLoading"
+      :sessions-error="sessionsError"
       :service-state="serviceState"
       :user-id="userId"
       :examples="examplePrompts"

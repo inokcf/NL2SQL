@@ -1,4 +1,4 @@
-# 电商问数前端（Vue 3）
+# AI问数前端（Vue 3）
 
 基于 Vue 3 + Vite + TypeScript 的问数工作台，对接本项目 FastAPI 后端的 SSE 问数接口和会话管理接口。
 

@@ -82,6 +82,8 @@ export function useChat() {
   const memories = ref<MemoryItem[]>([]);
   const isStreaming = ref(false);
   const memoryLoading = ref(false);
+  const sessionsLoading = ref(false);
+  const sessionsError = ref(false);
   const serviceState = ref<ServiceState>("ready");
   const notice = ref<Notice | null>(null);
 
@@ -108,10 +110,13 @@ export function useChat() {
   }
 
   async function refreshSessions(silent = true) {
+    sessionsLoading.value = true;
+    sessionsError.value = false;
     try {
       sessions.value = await listSessions(USER_ID, 30);
       if (!isStreaming.value) serviceState.value = "ready";
     } catch (error) {
+      sessionsError.value = true;
       if (!isStreaming.value) serviceState.value = "error";
       if (!silent) {
         pushNotice(
@@ -119,6 +124,8 @@ export function useChat() {
           error instanceof Error ? error.message : "会话列表加载失败",
         );
       }
+    } finally {
+      sessionsLoading.value = false;
     }
   }
 
@@ -318,6 +325,8 @@ export function useChat() {
     memories,
     isStreaming,
     memoryLoading,
+    sessionsLoading,
+    sessionsError,
     serviceState,
     notice,
     activeSession,

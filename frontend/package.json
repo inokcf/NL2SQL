@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.2.0",
   "type": "module",
-  "description": "电商问数智能体 Vue 前端，提供多轮对话、执行过程与查询结果展示。",
+  "description": "AI问数智能体 Vue 前端，提供多轮对话、执行过程与查询结果展示。",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit -p tsconfig.json && vite build",

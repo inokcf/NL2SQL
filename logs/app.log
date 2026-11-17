@@ -17,3 +17,30 @@
 2026-11-16 18:32:51.280 | INFO     | request_id - 8f564c8d-d9b7-4fda-a713-e4bfec7f14ee | app.agent.nodes.generate_sql:generate_sql:63 - 生成的SQL：SELECT SUM(f.order_amount) AS `销售总额` FROM fact_order f JOIN dim_region r ON f.region_id = r.region_id WHERE r.region_name = '华北';
 2026-11-16 18:32:51.295 | INFO     | request_id - 8f564c8d-d9b7-4fda-a713-e4bfec7f14ee | app.agent.nodes.validate_sql:validate_sql:34 - SQL语法正确
 2026-11-16 18:32:51.302 | INFO     | request_id - 8f564c8d-d9b7-4fda-a713-e4bfec7f14ee | app.agent.nodes.run_sql:run_sql:29 - SQL执行结果：[{'销售总额': 41099.5}]
+2026-11-17 10:41:30.363 | INFO     | request_id - c11e8e07-6420-4347-8079-81dab34df410 | app.agent.nodes.load_memory:load_memory:43 - 加载会话记忆：session_id=32f0ca48-8cca-4a22-bc71-6ceb2de21ddc, 历史消息=0, 长期记忆=0, 改写问题=统计华北地区的销售总额
+2026-11-17 10:41:31.088 | INFO     | request_id - c11e8e07-6420-4347-8079-81dab34df410 | app.agent.nodes.extract_keywords:extract_keywords:51 - 抽取关键词成功: ['华北地区', '销售总额', '统计华北地区的销售总额', '统计']
+2026-11-17 10:41:33.588 | INFO     | request_id - c11e8e07-6420-4347-8079-81dab34df410 | app.agent.nodes.recall_value:recall_value:64 - 检索到字段取值：['dim_region.region_name.华北']
+2026-11-17 10:41:35.337 | INFO     | request_id - c11e8e07-6420-4347-8079-81dab34df410 | app.agent.nodes.recall_metric:recall_metric:66 - 检索到指标信息：['GMV', 'AOV']
+2026-11-17 10:41:35.584 | INFO     | request_id - c11e8e07-6420-4347-8079-81dab34df410 | app.agent.nodes.merge_retrieved_info:merge_retrieved_info:143 - 合并后的表信息：['fact_order', 'dim_region']
+2026-11-17 10:41:35.584 | INFO     | request_id - c11e8e07-6420-4347-8079-81dab34df410 | app.agent.nodes.merge_retrieved_info:merge_retrieved_info:146 - 合并后的指标信息：['GMV', 'AOV']
+2026-11-17 10:41:36.842 | INFO     | request_id - c11e8e07-6420-4347-8079-81dab34df410 | app.agent.nodes.filter_metric:filter_metric:54 - 过滤后的指标信息：['GMV']
+2026-11-17 10:41:37.411 | INFO     | request_id - c11e8e07-6420-4347-8079-81dab34df410 | app.agent.nodes.filter_table:filter_table:60 - 过滤后的表信息：['fact_order', 'dim_region']
+2026-11-17 10:41:37.434 | INFO     | request_id - c11e8e07-6420-4347-8079-81dab34df410 | app.agent.nodes.add_extra_context:add_extra_context:36 - 数据库信息：{'dialect': 'mysql', 'version': '8.0.46'}
+2026-11-17 10:41:37.434 | INFO     | request_id - c11e8e07-6420-4347-8079-81dab34df410 | app.agent.nodes.add_extra_context:add_extra_context:37 - 日期信息：{'date': '2026-11-17', 'weekday': 'Tuesday', 'quarter': 'Q4'}
+2026-11-17 10:41:39.360 | INFO     | request_id - c11e8e07-6420-4347-8079-81dab34df410 | app.agent.nodes.generate_sql:generate_sql:67 - 生成的SQL：SELECT SUM(fo.order_amount) AS 销售总额 FROM fact_order fo INNER JOIN dim_region dr ON fo.region_id = dr.region_id WHERE dr.region_name = '华北';
+2026-11-17 10:41:39.377 | INFO     | request_id - c11e8e07-6420-4347-8079-81dab34df410 | app.agent.nodes.validate_sql:validate_sql:34 - SQL语法正确
+2026-11-17 10:41:39.385 | INFO     | request_id - c11e8e07-6420-4347-8079-81dab34df410 | app.agent.nodes.run_sql:run_sql:29 - SQL执行结果：[{'销售总额': 41099.5}]
+2026-11-17 10:43:40.830 | INFO     | request_id - 3afea535-b43c-4df3-a1e9-1310edd34e90 | app.agent.nodes.load_memory:load_memory:43 - 加载会话记忆：session_id=32f0ca48-8cca-4a22-bc71-6ceb2de21ddc, 历史消息=2, 长期记忆=0, 改写问题=统计2025年第一季度各大区的GMV，并按GMV从高到低排序
+2026-11-17 10:43:40.834 | INFO     | request_id - 3afea535-b43c-4df3-a1e9-1310edd34e90 | app.agent.nodes.extract_keywords:extract_keywords:51 - 抽取关键词成功: ['第一季度', 'GMV', '大区', '统计', '统计2025年第一季度各大区的GMV，并按GMV从高到低排序', '排序']
+2026-11-17 10:43:45.308 | INFO     | request_id - 3afea535-b43c-4df3-a1e9-1310edd34e90 | app.agent.nodes.recall_value:recall_value:64 - 检索到字段取值：[]
+2026-11-17 10:43:46.385 | INFO     | request_id - 3afea535-b43c-4df3-a1e9-1310edd34e90 | app.agent.nodes.recall_metric:recall_metric:66 - 检索到指标信息：['GMV', 'AOV']
+2026-11-17 10:43:46.414 | INFO     | request_id - 3afea535-b43c-4df3-a1e9-1310edd34e90 | app.agent.nodes.merge_retrieved_info:merge_retrieved_info:143 - 合并后的表信息：['dim_date', 'dim_region', 'fact_order', 'dim_product']
+2026-11-17 10:43:46.414 | INFO     | request_id - 3afea535-b43c-4df3-a1e9-1310edd34e90 | app.agent.nodes.merge_retrieved_info:merge_retrieved_info:146 - 合并后的指标信息：['GMV', 'AOV']
+2026-11-17 10:43:47.348 | INFO     | request_id - 3afea535-b43c-4df3-a1e9-1310edd34e90 | app.agent.nodes.filter_metric:filter_metric:54 - 过滤后的指标信息：['GMV']
+2026-11-17 10:43:58.375 | INFO     | request_id - 3afea535-b43c-4df3-a1e9-1310edd34e90 | app.agent.nodes.filter_table:filter_table:60 - 过滤后的表信息：['dim_region', 'fact_order']
+2026-11-17 10:43:58.402 | INFO     | request_id - 3afea535-b43c-4df3-a1e9-1310edd34e90 | app.agent.nodes.add_extra_context:add_extra_context:36 - 数据库信息：{'dialect': 'mysql', 'version': '8.0.46'}
+2026-11-17 10:43:58.403 | INFO     | request_id - 3afea535-b43c-4df3-a1e9-1310edd34e90 | app.agent.nodes.add_extra_context:add_extra_context:37 - 日期信息：{'date': '2026-11-17', 'weekday': 'Tuesday', 'quarter': 'Q4'}
+2026-11-17 10:44:00.416 | INFO     | request_id - 3afea535-b43c-4df3-a1e9-1310edd34e90 | app.agent.nodes.generate_sql:generate_sql:67 - 生成的SQL：SELECT r.region_name AS `大区`, SUM(o.order_amount) AS `GMV` FROM fact_order o JOIN dim_region r ON o.region_id = r.region_id WHERE o.date_id BETWEEN 20250101 AND 20250331 GROUP BY r.region_name ORDER BY `GMV` DESC;
+2026-11-17 10:44:00.438 | INFO     | request_id - 3afea535-b43c-4df3-a1e9-1310edd34e90 | app.agent.nodes.validate_sql:validate_sql:34 - SQL语法正确
+2026-11-17 10:44:00.458 | INFO     | request_id - 3afea535-b43c-4df3-a1e9-1310edd34e90 | app.agent.nodes.run_sql:run_sql:29 - SQL执行结果：[{'大区': '华东', 'GMV': 107373.0}, {'大区': '华南', 'GMV': 70202.0}, {'大区': '华北', 'GMV': 41099.5}, {'大区': '西南', 'GMV': 31528.0}, {'大区': '华中', 'GMV': 28957.0}]
+2026-11-17 10:44:23.905 | INFO     | request_id - 3afea535-b43c-4df3-a1e9-1310edd34e90 | app.services.conversation_memory_service:_save_long_term:306 - 写入长期记忆：episodic=1, semantic=1

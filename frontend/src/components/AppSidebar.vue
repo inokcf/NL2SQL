@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import {
+  AlertCircle,
   Brain,
   History,
+  LoaderCircle,
   MessageSquare,
   Plus,
   RefreshCw,
@@ -19,6 +21,8 @@ const props = defineProps<{
   sessions: SessionInfo[];
   activeSessionId: string | null;
   isStreaming: boolean;
+  sessionsLoading: boolean;
+  sessionsError: boolean;
   serviceState: ServiceState;
   userId: string;
   examples: ExamplePrompt[];
@@ -50,8 +54,8 @@ const statusClass = computed(() => `is-${props.serviceState}`);
           <Sparkles :size="20" />
         </div>
         <div class="brand-copy">
-          <strong>电商问数</strong>
-          <span>Shopkeeper Agent</span>
+          <strong>AI问数</strong>
+          <span>NL2SQL Agent</span>
         </div>
         <button
           type="button"
@@ -86,13 +90,36 @@ const statusClass = computed(() => `is-${props.serviceState}`);
             class="icon-button refresh-button"
             title="刷新会话"
             aria-label="刷新会话"
+            :disabled="sessionsLoading"
             @click="emit('refresh')"
           >
-            <RefreshCw :size="14" />
+            <LoaderCircle v-if="sessionsLoading" class="spin" :size="14" />
+            <RefreshCw v-else :size="14" />
           </button>
         </div>
 
-        <div v-if="sessions.length" class="session-list">
+        <div
+          v-if="sessionsLoading && !sessions.length"
+          class="empty-sessions is-loading"
+        >
+          <LoaderCircle class="spin" :size="18" />
+          <p>正在加载会话…</p>
+          <span>正在读取 Redis 短期记忆</span>
+        </div>
+
+        <div
+          v-else-if="sessionsError && !sessions.length"
+          class="empty-sessions is-error"
+        >
+          <AlertCircle :size="18" />
+          <p>会话加载失败</p>
+          <span>请确认后端服务正常运行</span>
+          <button type="button" class="retry-button" @click="emit('refresh')">
+            重新加载
+          </button>
+        </div>
+
+        <div v-else-if="sessions.length" class="session-list">
           <div
             v-for="session in sessions"
             :key="session.session_id"
@@ -433,6 +460,43 @@ const statusClass = computed(() => `is-${props.serviceState}`);
 
 .empty-sessions span {
   font-size: 11px;
+}
+
+.empty-sessions.is-loading > svg {
+  color: var(--brand);
+}
+
+.empty-sessions.is-error {
+  border-color: rgba(217, 82, 82, 0.2);
+  background: rgba(253, 236, 236, 0.45);
+}
+
+.empty-sessions.is-error > svg {
+  color: var(--danger);
+}
+
+.empty-sessions.is-error p {
+  color: #b33f3f;
+}
+
+.retry-button {
+  margin-top: 4px;
+  padding: 4px 10px;
+  border: 1px solid rgba(217, 82, 82, 0.22);
+  border-radius: 7px;
+  background: var(--surface);
+  color: var(--danger);
+  cursor: pointer;
+  font-size: 10.5px;
+  font-weight: 650;
+  transition:
+    background 150ms ease,
+    border-color 150ms ease;
+}
+
+.retry-button:hover {
+  border-color: rgba(217, 82, 82, 0.35);
+  background: var(--danger-soft);
 }
 
 .example-list {
